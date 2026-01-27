@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './userstyles/RegisterPage.css';
 
 const RegisterPage = () => {
@@ -13,6 +13,7 @@ const RegisterPage = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -34,7 +35,6 @@ const RegisterPage = () => {
     let tempErrors = {};
     let isValid = true;
 
-    // 1. Validasi Nama
     const nameRegex = /^[a-zA-Z\s]+$/;
     if (!formData.fullName.trim()) {
       tempErrors.fullName = "Full Name is required";
@@ -44,7 +44,6 @@ const RegisterPage = () => {
       isValid = false;
     }
 
-    // 2. Validasi Email (SUPER STRICT UNTUK TYPO GMAIL)
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const email = formData.email.toLowerCase(); 
     
@@ -55,20 +54,18 @@ const RegisterPage = () => {
       tempErrors.email = "Invalid email address format";
       isValid = false;
     } else if (
-      // --- DAFTAR BLACKLIST TYPO GMAIL ---
-      email.endsWith('@gmil.com') ||     // Kurang 'a'
-      email.endsWith('@gmal.com') ||     // Kurang 'i'
-      email.endsWith('@gmial.com') ||    // Kebalik 'ia'
-      email.endsWith('@gmaill.com') ||   // Kelebihan 'l'
-      email.endsWith('@gmai.com') ||     // Kurang 'l'
-      email.endsWith('@gmail.co') ||     // Kurang 'm'
-      email.endsWith('@mail.com') ||     // Kurang 'g'
-      email.endsWith('@gmail.comm')      // Kelebihan 'm'
+      email.endsWith('@gmil.com') ||     
+      email.endsWith('@gmal.com') ||     
+      email.endsWith('@gmial.com') ||    
+      email.endsWith('@gmaill.com') ||   
+      email.endsWith('@gmai.com') ||     
+      email.endsWith('@gmail.co') ||     
+      email.endsWith('@mail.com') ||     
+      email.endsWith('@gmail.comm')      
     ) {
-      tempErrors.email = "Please check your spelling email. Did you mean @gmail.com?";
+      tempErrors.email = "Did you mean @gmail.com?";
       isValid = false;
     } else if (
-      // Cek Typo Yahoo & Hotmail
       email.endsWith('@yahoo.co') || 
       email.endsWith('@hotmail.co')
     ) {
@@ -76,7 +73,6 @@ const RegisterPage = () => {
       isValid = false;
     }
 
-    // 3. Validasi Password
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
     if (!formData.password) {
       tempErrors.password = "Password is required";
@@ -86,7 +82,6 @@ const RegisterPage = () => {
       isValid = false;
     }
 
-    // 4. Confirm Password
     if (formData.confirmPassword !== formData.password) {
       tempErrors.confirmPassword = "Passwords do not match";
       isValid = false;
@@ -96,17 +91,60 @@ const RegisterPage = () => {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (validate()) {
-      console.log("Valid Data:", formData);
-      alert("Registration Successful! (Data Ready for Backend)");
+      try {
+        const registerResponse = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            nama: formData.fullName,
+            email: formData.email,
+            password: formData.password,
+            confPassword: formData.confirmPassword
+          }),
+        });
+
+        const registerData = await registerResponse.json();
+
+        if (registerResponse.ok) {
+          const loginResponse = await fetch('http://localhost:5000/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: formData.email,
+              password: formData.password
+            }),
+          });
+
+          const loginData = await loginResponse.json();
+
+          if (loginResponse.ok) {
+            localStorage.setItem('accessToken', loginData.accessToken);
+            alert("Registration Successful! Welcome.");
+            navigate('/');
+          } else {
+            alert("Registration Successful! Please Login.");
+            navigate('/login');
+          }
+
+        } else {
+          alert("Gagal: " + registerData.msg); 
+        }
+
+      } catch (error) {
+        console.error(error);
+        alert("Gagal terhubung ke Server.");
+      }
     }
   };
 
-  // --- Fungsi Placeholder untuk Google Login ---
   const handleGoogleLogin = () => {
-    alert("Fitur Google Login akan diaktifkan saat Backend siap!");
+    alert("Fitur Google Login akan diaktifkan nanti!");
   };
 
   return (
@@ -189,14 +227,11 @@ const RegisterPage = () => {
             
             <button type="submit" className="btn-register">Register</button>
 
-            {/* --- PEMBATAS (DIVIDER) --- */}
             <div className="divider">
               <span>OR</span>
             </div>
 
-            {/* --- TOMBOL GOOGLE LOGIN --- */}
             <button type="button" className="btn-google" onClick={handleGoogleLogin}>
-              {/* Logo Google SVG */}
               <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>

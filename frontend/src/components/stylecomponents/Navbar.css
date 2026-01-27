@@ -1,63 +1,137 @@
 .navbar {
   background: white;
   border-bottom: 1px solid #eee;
-  padding: 15px 0;
+  padding: 0;
+  height: 90px; /* DIPERBESAR: Sebelumnya 70px */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03); /* Bayangan sedikit dipertegas */
+  position: sticky; /* Opsional: Agar navbar nempel di atas saat scroll */
+  top: 0;
+  z-index: 100;
 }
 
-.navbar-container {
+.navbar-container-fluid {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 30px;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-weight: bold;
-  font-size: 18px;
 }
 
 .logo-image {
-  height: 40px;
+  height: 55px; /* LOGO DIPERBESAR: Menyesuaikan navbar baru */
+  transition: transform 0.3s;
 }
 
-.highlight-text {
-  color: var(--primary-orange);
+.logo-image:hover {
+  transform: scale(1.05);
 }
 
-.menu-section {
+/* Menu Tengah */
+.menu-center {
   display: flex;
-  gap: 20px;
-  font-size: 14px;
+  gap: 60px; /* JARAK DIPERJAUH: Sebelumnya 40px */
+  font-size: 16px;
+  font-weight: 500;
   color: #555;
+  height: 100%;
   align-items: center;
 }
 
 .menu-link {
   text-decoration: none;
-  color: inherit;
+  color: #666;
+  position: relative;
   transition: color 0.3s;
+  padding: 5px 0;
 }
 
+/* Efek Hover */
 .menu-link:hover {
   color: var(--primary-orange);
 }
 
-.btn-nav-login {
+/* Efek Garis Bawah (Underline Animation) */
+.menu-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 3px; /* Garis sedikit ditebalkan */
+  bottom: -5px;
+  left: 0;
   background-color: var(--primary-orange);
-  color: white;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s;
+  transition: width 0.3s ease-in-out;
+  border-radius: 2px;
 }
 
-.btn-nav-login:hover {
-  background-color: #e08213;
+.menu-link:hover::after {
+  width: 100%;
+}
+
+/* --- STATE ACTIVE (Halaman Sedang Dibuka) --- */
+.menu-link.active {
+  color: var(--primary-orange);
+  font-weight: 600;
+}
+
+/* Garis bawah PERMANEN jika menu aktif */
+.menu-link.active::after {
+  width: 100%;
+}
+
+/* Profil Section */
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 20px; /* Padding sedikit diperbesar */
+  border-radius: 50px;
+  background-color: #f8f9fa;
+  border: 1px solid #eee;
+  transition: box-shadow 0.3s;
+}
+
+.profile-section:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.profile-icon {
+  color: var(--primary-orange);
+  display: flex;
+  align-items: center;
+}
+
+.profile-text {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+  margin-right: 10px;
+  cursor: default;
+}
+
+.btn-logout-small {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.btn-logout-small:hover {
+  color: #dc2626;
+  background-color: #ffebee;
+  transform: scale(1.1);
 }

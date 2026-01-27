@@ -1,8 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Tambah Navigate
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import LoginPage from './user/LoginPage';
 import RegisterPage from './user/RegisterPage';
+import HomePage from './user/HomePage';
 
 import './App.css';
 
@@ -10,11 +11,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Tambahkan baris ini: Kalau buka root (/), alihkan ke /login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<HomePage />} />
         
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        
+        {/* Jika user mengetik alamat aneh, baru lempar ke login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
