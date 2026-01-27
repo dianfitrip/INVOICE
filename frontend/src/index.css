@@ -1,0 +1,17 @@
+:root {
+  --primary-orange: #F7941E;
+  --text-black: #333333;
+  --bg-light: #F9FAFB;
+  --border-color: #E5E7EB;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-black);
+}
+
+* {
+  box-sizing: border-box;
+}

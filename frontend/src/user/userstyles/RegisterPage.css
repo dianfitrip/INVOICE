@@ -1,0 +1,130 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90vh;
+  padding: 20px;
+}
+
+.register-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.register-title {
+  color: var(--primary-orange);
+  font-size: 32px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.register-form {
+  text-align: left;
+}
+
+.btn-register {
+  background-color: var(--primary-orange);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+  transition: background 0.3s;
+}
+
+.btn-register:hover {
+  background-color: #e08213;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  padding-right: 45px; 
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.3s;
+}
+
+.password-toggle-icon:hover {
+  color: var(--primary-orange);
+}
+
+.error-text {
+  color: #dc2626; /* Merah */
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+.input-error {
+  border-color: #dc2626 !important;
+  background-color: #fef2f2;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #999;
+  font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.divider span {
+  padding: 0 10px;
+}
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-google:hover {
+  background-color: #f8f9fa;
+  border-color: #ccc;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
