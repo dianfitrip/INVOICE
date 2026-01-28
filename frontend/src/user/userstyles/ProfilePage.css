@@ -1,0 +1,168 @@
+.profile-page-bg {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.profile-card {
+    background: white;
+    max-width: 600px;
+    margin: 40px auto; /* Tengah secara horizontal */
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #F7941E, #ffb74d);
+    padding: 40px 20px;
+    text-align: center;
+    color: white;
+}
+
+.avatar-circle {
+    width: 80px;
+    height: 80px;
+    background: white;
+    color: #F7941E;
+    border-radius: 50%;
+    font-size: 36px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.profile-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.email-text {
+    margin: 5px 0 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.profile-body {
+    padding: 30px;
+}
+
+/* Info Row Style */
+.info-row {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+.info-row label {
+    display: block;
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.info-value {
+    font-size: 16px;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-edit {
+    padding: 12px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-edit:hover {
+    background: #f9f9f9;
+    border-color: #ccc;
+}
+
+.btn-logout-big {
+    padding: 12px;
+    background: #ffebee;
+    border: 1px solid #ffcdd2;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #c62828;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-logout-big:hover {
+    background: #ffcdd2;
+}
+
+/* Edit Form */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #555;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.form-input:focus {
+    border-color: #F7941E;
+    outline: none;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 12px;
+    background: #f1f1f1;
+    border: none;
+    border-radius: 8px;
+    color: #666;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-save {
+    flex: 1;
+    padding: 12px;
+    background: #F7941E;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-save:hover {
+    background: #e08213;
+}

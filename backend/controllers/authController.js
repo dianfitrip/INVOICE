@@ -1,27 +1,30 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs'); // Pastikan ini di-import!
 
-// Fungsi Register
+// 1. REGISTER (DENGAN HASHING)
 exports.registerUser = async (req, res) => {
     const { nama, email, password, confPassword } = req.body;
 
-    // 1. Validasi Password Match
     if (password !== confPassword) {
         return res.status(400).json({ msg: "Password dan Confirm Password tidak cocok" });
     }
 
     try {
-        // 2. Cek apakah email sudah ada
         const existingUser = await User.findOne({ where: { email: email } });
         if (existingUser) {
             return res.status(400).json({ msg: "Email sudah terdaftar" });
         }
 
-        // 3. Buat User Baru (Password otomatis di-hash oleh Model Hooks)
+        // --- PERBAIKAN: HASH PASSWORD SEBELUM SIMPAN ---
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(password, salt);
+        // ----------------------------------------------
+
         await User.create({
             nama: nama,
             email: email,
-            password: password,
+            password: hashPassword, // Simpan password yang sudah di-hash
             role: 'user' 
         });
 
@@ -32,30 +35,29 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-// Fungsi Login
+// 2. LOGIN (DENGAN COMPARE HASH)
 exports.loginUser = async (req, res) => {
     try {
-        // 1. Cari User berdasarkan Email
         const user = await User.findOne({ 
             where: { email: req.body.email } 
         });
 
-        // Jika user tidak ketemu
         if (!user) return res.status(404).json({ msg: "Email tidak ditemukan" });
 
-        // 2. Cek Password (menggunakan method yang kita buat di Model User tadi)
-        const isMatch = await user.matchPassword(req.body.password);
+        // --- PERBAIKAN: BANDINGKAN PASSWORD ---
+        // compare(passwordInput, passwordDatabaseHash)
+        const isMatch = await bcrypt.compare(req.body.password, user.password);
         
         if (!isMatch) return res.status(400).json({ msg: "Password salah" });
+        // -------------------------------------
 
-        // 3. Buat Token JWT (Untuk sesi login)
         const userId = user.id_user;
         const nama = user.nama;
         const email = user.email;
         const role = user.role;
 
         const accessToken = jwt.sign({ userId, nama, email, role }, process.env.JWT_SECRET, {
-            expiresIn: '1d' // Token berlaku 1 hari
+            expiresIn: '1d'
         });
 
         res.json({ accessToken });
@@ -66,18 +68,44 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-// Fungsi Cek Profil (Me) - Untuk mengambil data user yang sedang login
+// 3. GET ME (Tetap sama)
 exports.getMe = async (req, res) => {
-    // Logic ini nanti butuh middleware verifikasi token
-    if(!req.userId) return res.status(401).json({msg: "Mohon login akun Anda"});
-    
-    const user = await User.findOne({
-        attributes: ['id_user', 'nama', 'email', 'role'],
-        where: {
-            id_user: req.userId
+    try {
+        const user = await User.findByPk(req.userId, {
+            attributes: ['id_user', 'nama', 'email', 'role']
+        });
+        if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
+        res.json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Server Error" });
+    }
+};
+
+// 4. UPDATE PROFILE (Tetap sama, pastikan hash password jika diganti)
+exports.updateProfile = async (req, res) => {
+    try {
+        const user = await User.findByPk(req.userId);
+        if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
+
+        const { nama, email, password } = req.body;
+
+        user.nama = nama || user.nama;
+        user.email = email || user.email;
+
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
         }
-    });
-    
-    if(!user) return res.status(404).json({msg: "User tidak ditemukan"});
-    res.json(user);
+
+        await user.save();
+
+        res.json({ 
+            msg: "Profil berhasil diperbarui!", 
+            user: { id_user: user.id_user, nama: user.nama, email: user.email }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Gagal update profil" });
+    }
 };

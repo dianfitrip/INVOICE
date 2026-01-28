@@ -3,12 +3,12 @@
   min-height: 100vh;
 }
 
-/* Container Utama untuk Konten Tengah */
+/* Container Utama */
 .main-content-container {
-  max-width: 1200px;  /* Lebar maksimum sama dengan Navbar */
-  margin: 0 auto;     /* Posisi tengah otomatis */
-  padding: 40px 30px; /* Jarak atas/bawah & kiri/kanan */
-  width: 100%;        /* Pastikan responsif */
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  width: 100%;
 }
 
 /* Header Welcome */
@@ -40,30 +40,31 @@
   color: var(--primary-orange, #f7941e);
 }
 
-.date-badge {
-  background: #fff8e1;
-  color: #f57f17;
-  padding: 8px 16px;
-  border-radius: 20px;
+.date-display {
+  background-color: #f8f9fa;
+  padding: 10px 20px;
+  border-radius: 8px;
   font-weight: 500;
+  color: #555;
   font-size: 14px;
 }
 
-/* Dashboard Stats Grid */
-.dashboard-grid {
+/* Stats Grid */
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* Sedikit diperlebar minmax-nya */
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
+  margin-bottom: 40px;
 }
 
 .card-stat {
   background: white;
-  padding: 25px; /* Padding kartu diperbesar sedikit biar lega */
+  padding: 25px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -89,7 +90,7 @@
 
 .info-stat h3 {
   margin: 0;
-  font-size: 26px; /* Angka diperbesar */
+  font-size: 26px;
   color: #333;
   font-weight: 700;
 }
@@ -100,43 +101,54 @@
   color: #888;
 }
 
-/* Quick Action Menu */
+/* --- Style Pindahan dari Inline JS --- */
+.section-title {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 20px; /* Opsional: diperjelas ukurannya */
+  font-weight: bold;
+}
+
+/* Action Menu */
 .action-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 15px;
-  flex-wrap: wrap;
 }
 
 .btn-action {
-  padding: 14px 28px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.2s;
   background-color: var(--primary-orange, #f7941e);
   color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 10px;
   font-size: 15px;
-  box-shadow: 0 2px 5px rgba(247, 148, 30, 0.3);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .btn-action:hover {
   background-color: #e08213;
-  transform: translateY(-2px);
 }
 
 .btn-action.outline {
   background-color: white;
   border: 1px solid #ddd;
   color: #555;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .btn-action.outline:hover {
   background-color: #f8f9fa;
   border-color: #ccc;
-  color: #333;
+}
+
+.plus-icon {
+  font-size: 18px;
+  font-weight: bold;
 }

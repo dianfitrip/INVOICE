@@ -1,8 +1,20 @@
-/* Layout Utama */
+.invoice-page-bg {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.main-content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  width: 100%;
+}
+
 .detail-layout {
   display: flex;
   gap: 30px;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .detail-card {
@@ -19,10 +31,9 @@
 .right-panel {
   flex: 1;
   min-width: 300px;
-  height: fit-content; /* Agar panel kanan tidak memanjang kosong ke bawah */
+  height: fit-content;
 }
 
-/* Tombol Kembali */
 .btn-back {
   margin-bottom: 20px;
   cursor: pointer;
@@ -32,13 +43,13 @@
   border-radius: 6px;
   color: #555;
   transition: all 0.2s;
+  display: inline-block;
 }
 
 .btn-back:hover {
   background-color: #f1f1f1;
 }
 
-/* Header Invoice */
 .invoice-header {
   border-bottom: 1px solid #eee;
   padding-bottom: 15px;
@@ -48,27 +59,71 @@
 .invoice-title {
   margin: 0;
   color: #333;
+  font-size: 24px;
+}
+
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.status-badge.belum-dibayar {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.status-badge.menunggu-verifikasi {
+  background-color: #fff3e0;
+  color: #f57f17;
+}
+
+.status-badge.dibayar {
+  background-color: #e8f5e9;
+  color: #2e7d32;
 }
 
 .panel-title {
   margin-top: 0;
   color: #333;
   margin-bottom: 20px;
+  font-size: 18px;
 }
 
-/* Tabel Invoice (Reuse style dari InvoicePage tapi ada tambahan) */
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.invoice-table th {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 2px solid #eee;
+  color: #666;
+  font-size: 14px;
+}
+
+.invoice-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  font-size: 14px;
+}
+
 .text-right { text-align: right; }
 .fw-bold { font-weight: bold; }
 .pt-20 { padding-top: 20px; }
 
 .total-amount {
   padding-top: 20px;
-  font-size: 18px;
-  color: #F7941E; /* Warna Orange RJI */
+  font-size: 20px;
+  color: #F7941E;
   font-weight: bold;
 }
 
-/* Form Upload Styles */
 .input-label {
   display: block;
   margin-bottom: 8px;
@@ -77,12 +132,42 @@
   color: #555;
 }
 
+.input-helper {
+  font-size: 13px;
+  color: #666;
+  margin-top: -5px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.input-helper b {
+  color: #333;
+}
+
+.form-input {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border 0.2s;
+}
+
+.form-input:focus {
+  border-color: #F7941E;
+  outline: none;
+}
+
 .full-width {
   width: 100%;
+  box-sizing: border-box;
 }
 
 .mb-15 { margin-bottom: 15px; }
 .mb-20 { margin-bottom: 20px; }
+
+.preview-wrapper {
+  animation: fadeIn 0.3s ease;
+}
 
 .preview-box {
   margin-top: 10px;
@@ -98,6 +183,28 @@
   border-radius: 4px;
 }
 
+.btn-remove-file {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.btn-remove-file:hover {
+  background-color: #ffcdd2;
+}
+
 .btn-submit-payment {
   width: 100%;
   padding: 12px;
@@ -108,13 +215,13 @@
   font-weight: bold;
   cursor: pointer;
   transition: background 0.2s;
+  margin-top: 10px;
 }
 
 .btn-submit-payment:hover {
   background-color: #e08213;
 }
 
-/* Status Messages (Setelah upload) */
 .payment-status-message {
   text-align: center;
   color: #666;
@@ -131,4 +238,9 @@
   padding: 50px;
   color: #888;
   font-size: 18px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

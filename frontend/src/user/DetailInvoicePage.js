@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import './userstyles/DetailInvoicePage.css'; // Kita buat file CSS khusus ini
+import Swal from 'sweetalert2'; // Import SweetAlert2
+import './userstyles/DetailInvoicePage.css'; 
 
 const DetailInvoicePage = () => {
     const { id } = useParams();
@@ -23,11 +24,12 @@ const DetailInvoicePage = () => {
             if(response.ok) {
                 setInvoice(data);
             } else {
-                alert("Invoice tidak ditemukan!");
-                navigate('/invoice');
+                Swal.fire('Tidak Ditemukan', 'Data invoice tidak ditemukan', 'error')
+                    .then(() => navigate('/invoice'));
             }
         } catch (error) {
             console.error(error);
+            Swal.fire('Error', 'Gagal memuat data invoice', 'error');
         }
     }, [id, navigate]);
 
@@ -38,20 +40,61 @@ const DetailInvoicePage = () => {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if(file) {
+            // Validasi Ukuran File (Misal maks 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                return Swal.fire('File Terlalu Besar', 'Maksimal ukuran file adalah 2MB', 'warning');
+            }
             setFileBukti(file);
             setPreviewUrl(URL.createObjectURL(file));
         }
     };
 
+    const handleRemoveFile = () => {
+        setFileBukti(null);
+        setPreviewUrl('');
+    };
+
     const handleUpload = async (e) => {
         e.preventDefault();
-        if(!fileBukti || !tanggalBayar) return alert("Lengkapi data pembayaran!");
+
+        // --- 1. VALIDASI INPUT ---
+        if(!fileBukti || !tanggalBayar) {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'Data Belum Lengkap',
+                text: 'Mohon isi Tanggal Bayar dan upload Bukti Transfer.',
+                confirmButtonColor: '#F7941E'
+            });
+        }
+
+        // --- 2. KONFIRMASI UPLOAD ---
+        const result = await Swal.fire({
+            title: 'Kirim Bukti Pembayaran?',
+            text: "Pastikan foto bukti transfer terlihat jelas.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#F7941E',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Kirim',
+            cancelButtonText: 'Batal'
+        });
+
+        if (!result.isConfirmed) return;
 
         const token = localStorage.getItem('accessToken');
         const formData = new FormData();
         formData.append('id_invoice', id);
         formData.append('tanggal_bayar', tanggalBayar);
         formData.append('bukti_pembayaran', fileBukti);
+
+        // Loading State
+        Swal.fire({
+            title: 'Sedang Mengirim...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         try {
             const response = await fetch('http://localhost:5000/api/payments', {
@@ -61,13 +104,32 @@ const DetailInvoicePage = () => {
             });
 
             if(response.ok) {
-                alert("Bukti Pembayaran Berhasil Diupload!");
+                // --- 3. ALERT SUKSES ---
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Bukti pembayaran telah dikirim.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                
+                // Refresh data untuk melihat status terbaru
                 fetchDetailInvoice();
+                
+                // Reset Form (Opsional, karena status invoice berubah form akan hilang)
+                setTanggalBayar('');
+                handleRemoveFile();
             } else {
-                alert("Gagal upload.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Terjadi kesalahan saat upload bukti.',
+                    confirmButtonColor: '#d33'
+                });
             }
         } catch (error) {
             console.error(error);
+            Swal.fire('Error', 'Gagal terhubung ke server', 'error');
         }
     };
 
@@ -80,7 +142,6 @@ const DetailInvoicePage = () => {
             <Navbar />
             <div className="main-content-container">
                 
-                {/* Tombol Kembali */}
                 <button onClick={() => navigate('/invoice')} className="btn-back">
                     &larr; Kembali
                 </button>
@@ -143,16 +204,31 @@ const DetailInvoicePage = () => {
 
                                 <div className="form-group mb-20">
                                     <label className="input-label">Bukti Transfer</label>
-                                    <input 
-                                        type="file" 
-                                        accept="image/*"
-                                        onChange={handleFileChange}
-                                        required
-                                        className="full-width"
-                                    />
-                                    {previewUrl && (
-                                        <div className="preview-box">
-                                            <img src={previewUrl} alt="Preview" />
+                                    
+                                    <p className="input-helper">
+                                        Silakan upload <b>screenshot m-banking</b> atau <b>foto struk</b> bukti pembayaran Anda. (Format: JPG/PNG, Maks 2MB)
+                                    </p>
+
+                                    {!fileBukti ? (
+                                        <input 
+                                            type="file" 
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            required
+                                            className="full-width"
+                                        />
+                                    ) : (
+                                        <div className="preview-wrapper">
+                                            <div className="preview-box">
+                                                <img src={previewUrl} alt="Preview" />
+                                            </div>
+                                            <button 
+                                                type="button" 
+                                                className="btn-remove-file"
+                                                onClick={handleRemoveFile}
+                                            >
+                                                Hapus Foto &times;
+                                            </button>
                                         </div>
                                     )}
                                 </div>

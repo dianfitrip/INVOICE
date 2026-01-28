@@ -57,3 +57,22 @@ exports.getMyInvoices = async (req, res) => {
         res.status(500).json({ msg: "Gagal mengambil data invoice" });
     }
 };
+
+exports.getInvoiceById = async (req, res) => {
+    try {
+        const invoice = await Invoice.findOne({
+            where: { 
+                id_invoice: req.params.id,
+                id_user: req.userId // Pastikan user cuma bisa lihat invoicenya sendiri
+            },
+            include: [{ model: InvoiceItem, as: 'items' }]
+        });
+
+        if(!invoice) return res.status(404).json({msg: "Invoice tidak ditemukan"});
+        
+        res.json(invoice);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: "Server Error" });
+    }
+};

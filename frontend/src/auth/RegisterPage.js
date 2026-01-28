@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './userstyles/RegisterPage.css';
+import './authstyles/RegisterPage.css';
 
 const RegisterPage = () => {
   const [showPassword, setShowPassword] = useState(false);

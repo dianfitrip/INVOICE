@@ -58,6 +58,13 @@
     font-size: 14px;
 }
 
+/* Class Baru untuk Menggantikan Inline Style */
+.empty-data-row {
+    text-align: center;
+    padding: 30px;
+    color: #888;
+}
+
 .fw-bold { font-weight: 600; }
 .text-orange { color: var(--primary-orange, #f7941e); }
 
@@ -133,6 +140,25 @@
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
+}
+
+/* Class Baru untuk Item Input (Menggantikan Flex Inline) */
+.label-block {
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.input-desc {
+    flex: 2;
+}
+
+.input-qty {
+    flex: 0.5;
+}
+
+.input-price {
+    flex: 1;
 }
 
 .btn-add-item {
