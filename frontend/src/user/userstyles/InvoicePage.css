@@ -1,0 +1,167 @@
+.invoice-page-bg {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-header h2 {
+    color: #333;
+    margin: 0;
+}
+
+.btn-action-primary {
+    background-color: var(--primary-orange, #f7941e);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-action-primary:hover {
+    background-color: #e08213;
+}
+
+.invoice-table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.invoice-table th {
+    background-color: #f8f9fa;
+    color: #555;
+    text-align: left;
+    padding: 15px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.invoice-table td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    font-size: 14px;
+}
+
+.fw-bold { font-weight: 600; }
+.text-orange { color: var(--primary-orange, #f7941e); }
+
+/* Status Badges */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.belum-dibayar {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.status-badge.menunggu-verifikasi {
+    background-color: #fff3e0;
+    color: #f57f17;
+}
+
+.status-badge.dibayar {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.btn-small-outline {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-small-outline:hover {
+    background: #f1f1f1;
+}
+
+/* MODAL STYLES */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.item-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-add-item {
+    background: none;
+    border: 1px dashed #ccc;
+    width: 100%;
+    padding: 8px;
+    color: #666;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.btn-remove {
+    background: #ffebee;
+    border: none;
+    color: red;
+    width: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-submit-modal {
+    width: 100%;
+    background-color: var(--primary-orange, #f7941e);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    margin-top: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
