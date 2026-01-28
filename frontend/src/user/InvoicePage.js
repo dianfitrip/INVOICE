@@ -123,7 +123,13 @@ const InvoicePage = () => {
                                             </span>
                                         </td>
                                         <td>
-                                            <button className="btn-small-outline">Detail</button>
+                                            {/* PERBAIKAN DI SINI: Navigasi ke Halaman Detail */}
+                                            <button 
+                                                className="btn-small-outline"
+                                                onClick={() => navigate(`/invoice/${inv.id_invoice}`)}
+                                            >
+                                                Detail
+                                            </button>
                                         </td>
                                     </tr>
                                 ))

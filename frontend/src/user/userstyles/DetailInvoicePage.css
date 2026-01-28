@@ -1,0 +1,134 @@
+/* Layout Utama */
+.detail-layout {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.detail-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.left-panel {
+  flex: 2;
+}
+
+.right-panel {
+  flex: 1;
+  min-width: 300px;
+  height: fit-content; /* Agar panel kanan tidak memanjang kosong ke bawah */
+}
+
+/* Tombol Kembali */
+.btn-back {
+  margin-bottom: 20px;
+  cursor: pointer;
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  color: #555;
+  transition: all 0.2s;
+}
+
+.btn-back:hover {
+  background-color: #f1f1f1;
+}
+
+/* Header Invoice */
+.invoice-header {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.invoice-title {
+  margin: 0;
+  color: #333;
+}
+
+.panel-title {
+  margin-top: 0;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Tabel Invoice (Reuse style dari InvoicePage tapi ada tambahan) */
+.text-right { text-align: right; }
+.fw-bold { font-weight: bold; }
+.pt-20 { padding-top: 20px; }
+
+.total-amount {
+  padding-top: 20px;
+  font-size: 18px;
+  color: #F7941E; /* Warna Orange RJI */
+  font-weight: bold;
+}
+
+/* Form Upload Styles */
+.input-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.mb-15 { margin-bottom: 15px; }
+.mb-20 { margin-bottom: 20px; }
+
+.preview-box {
+  margin-top: 10px;
+  text-align: center;
+  border: 1px dashed #ddd;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.preview-box img {
+  max-height: 150px;
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+.btn-submit-payment {
+  width: 100%;
+  padding: 12px;
+  background-color: #F7941E;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-submit-payment:hover {
+  background-color: #e08213;
+}
+
+/* Status Messages (Setelah upload) */
+.payment-status-message {
+  text-align: center;
+  color: #666;
+  padding: 20px 0;
+}
+
+.status-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 50px;
+  color: #888;
+  font-size: 18px;
+}
