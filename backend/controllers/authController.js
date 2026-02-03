@@ -24,7 +24,7 @@ exports.registerUser = async (req, res) => {
         await User.create({
             nama: nama,
             email: email,
-            password: hashPassword, // Simpan password yang sudah di-hash
+            password: password, // Simpan password yang sudah di-hash
             role: 'user' 
         });
 
@@ -45,11 +45,9 @@ exports.loginUser = async (req, res) => {
         if (!user) return res.status(404).json({ msg: "Email tidak ditemukan" });
 
         // --- PERBAIKAN: BANDINGKAN PASSWORD ---
-        // compare(passwordInput, passwordDatabaseHash)
-        const isMatch = await bcrypt.compare(req.body.password, user.password);
-        
+        // Di authController.js (Bagian Login)
+        const isMatch = await user.matchPassword(req.body.password); 
         if (!isMatch) return res.status(400).json({ msg: "Password salah" });
-        // -------------------------------------
 
         const userId = user.id_user;
         const nama = user.nama;
