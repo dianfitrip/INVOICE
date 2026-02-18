@@ -1,9 +1,9 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// 1. REGISTER (Biarkan Model yang melakukan Hashing)
 exports.registerUser = async (req, res) => {
-    const { nama, email, password, confPassword } = req.body;
+    // Tangkap 'role' dari body request
+    const { nama, email, password, confPassword, role } = req.body; // <--- PERUBAHAN 1
 
     if (password !== confPassword) {
         return res.status(400).json({ msg: "Password dan Confirm Password tidak cocok" });
@@ -15,13 +15,12 @@ exports.registerUser = async (req, res) => {
             return res.status(400).json({ msg: "Email sudah terdaftar" });
         }
 
-        // CUKUP KIRIM PASSWORD ASLI
-        // Hook 'beforeCreate' di models/User.js akan otomatis melakukan hashing
         await User.create({
             nama: nama,
             email: email,
             password: password, 
-            role: 'user' 
+            // Gunakan role dari input Postman. Jika kosong, default ke 'user'
+            role: role || 'user'  // <--- PERUBAHAN 2
         });
 
         res.status(201).json({ msg: "Register Berhasil! Silakan Login." });
