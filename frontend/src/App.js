@@ -22,31 +22,35 @@ function App() {
         <Route path="/invoice/:id" element={<DetailInvoicePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         
+        <Route path="/admin" element={
+            <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
+                <AdminDashboard />
+            </ProtectedRoute>
+        } />
 
-        
-        <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin', 'superadmin']}><AdminDashboard /></ProtectedRoute>
-} />
-
-        {/* Jika user mengetik alamat aneh, baru lempar ke login */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
 }
 
-// Tambahkan komponen ini di App.js
+// PERBAIKAN ADA DI SINI:
 const ProtectedRoute = ({ children, allowedRoles }) => {
-    const token = localStorage.getItem('token');
+    // Ganti 'token' menjadi 'accessToken'
+    const token = localStorage.getItem('accessToken'); // <--- SUDAH DIPERBAIKI
+    
     if (!token) return <Navigate to="/login" />;
     
-    const decoded = JSON.parse(atob(token.split('.')[1]));
-    if (!allowedRoles.includes(decoded.role.toLowerCase())) {
-        return <Navigate to="/" />;
+    try {
+        const decoded = JSON.parse(atob(token.split('.')[1]));
+        if (!allowedRoles.includes(decoded.role.toLowerCase())) {
+            return <Navigate to="/" />;
+        }
+    } catch (error) {
+        return <Navigate to="/login" />;
     }
+    
     return children;
 };
-
-
-
 
 export default App;
