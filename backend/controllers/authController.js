@@ -1,8 +1,7 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); // Pastikan ini di-import!
 
-// 1. REGISTER (DENGAN HASHING)
+// 1. REGISTER (Biarkan Model yang melakukan Hashing)
 exports.registerUser = async (req, res) => {
     const { nama, email, password, confPassword } = req.body;
 
@@ -16,15 +15,12 @@ exports.registerUser = async (req, res) => {
             return res.status(400).json({ msg: "Email sudah terdaftar" });
         }
 
-        // --- PERBAIKAN: HASH PASSWORD SEBELUM SIMPAN ---
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(password, salt);
-        // ----------------------------------------------
-
+        // CUKUP KIRIM PASSWORD ASLI
+        // Hook 'beforeCreate' di models/User.js akan otomatis melakukan hashing
         await User.create({
             nama: nama,
             email: email,
-            password: password, // Simpan password yang sudah di-hash
+            password: password, 
             role: 'user' 
         });
 
@@ -35,7 +31,7 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-// 2. LOGIN (DENGAN COMPARE HASH)
+// 2. LOGIN (Gunakan matchPassword dari Model)
 exports.loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ 
@@ -44,19 +40,18 @@ exports.loginUser = async (req, res) => {
 
         if (!user) return res.status(404).json({ msg: "Email tidak ditemukan" });
 
-        // --- PERBAIKAN: BANDINGKAN PASSWORD ---
-        // Di authController.js (Bagian Login)
-        const isMatch = await user.matchPassword(req.body.password); 
+        // Memanggil helper yang ada di models/User.js
+        const isMatch = await user.matchPassword(req.body.password);
+        
         if (!isMatch) return res.status(400).json({ msg: "Password salah" });
 
-        const userId = user.id_user;
-        const nama = user.nama;
-        const email = user.email;
-        const role = user.role;
+        const { id_user: userId, nama, email, role } = user;
 
-        const accessToken = jwt.sign({ userId, nama, email, role }, process.env.JWT_SECRET, {
-            expiresIn: '1d'
-        });
+        const accessToken = jwt.sign(
+            { userId, nama, email, role }, 
+            process.env.JWT_SECRET, 
+            { expiresIn: '1d' }
+        );
 
         res.json({ accessToken });
 

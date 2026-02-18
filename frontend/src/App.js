@@ -23,13 +23,30 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         
 
-        <Route path="/admin" element={<AdminDashboard />} />
         
+        <Route path="/admin" element={<ProtectedRoute allowedRoles={['admin', 'superadmin']}><AdminDashboard /></ProtectedRoute>
+} />
+
         {/* Jika user mengetik alamat aneh, baru lempar ke login */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
 }
+
+// Tambahkan komponen ini di App.js
+const ProtectedRoute = ({ children, allowedRoles }) => {
+    const token = localStorage.getItem('token');
+    if (!token) return <Navigate to="/login" />;
+    
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    if (!allowedRoles.includes(decoded.role.toLowerCase())) {
+        return <Navigate to="/" />;
+    }
+    return children;
+};
+
+
+
 
 export default App;
