@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import './adminstyles/AdminDashboard.css';
+import AdminSidebar from './AdminSidebar';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState({ nama: '', role: '' });
     
-    // State Statistik Dummy (Nanti dihubungkan ke API)
+    // State Statistik
     const [stats, setStats] = useState({
         totalUser: 0,
         totalAdmin: 0,
@@ -42,8 +41,6 @@ const AdminDashboard = () => {
     };
 
     const fetchDataStats = async (token) => {
-        // Disini nanti fetch ke API Dashboard
-        // Untuk sekarang kita pakai dummy data user + real data invoice
         try {
             const response = await fetch('http://localhost:5000/api/invoices', {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -63,102 +60,51 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleLogout = () => {
-        Swal.fire({
-            title: 'Keluar?',
-            text: "Anda akan kembali ke halaman login",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Ya, Keluar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                localStorage.removeItem('accessToken');
-                navigate('/login');
-            }
-        });
-    };
-
     return (
-        <div className="admin-layout">
-            {/* SIDEBAR */}
-            <aside className="admin-sidebar">
-                <div className="sidebar-header">
-                    <img src="/logorji.png" alt="RJI Logo" className="sidebar-logo"/>
-                    <span className="badge-role">{user.role}</span>
-                </div>
-                
-                <nav className="sidebar-nav">
-                    <div className="nav-item active">
-                        <span>📊</span> Dashboard
-                    </div>
-                    <div className="nav-item">
-                        <span>👥</span> Kelola User
-                    </div>
-                    
-                    {/* Menu Khusus Superadmin */}
-                    {user.role === 'superadmin' && (
-                        <div className="nav-item">
-                            <span>🛡️</span> Kelola Admin
-                        </div>
-                    )}
-
-                    <div className="nav-item">
-                        <span>🧾</span> Kelola Invoice
-                    </div>
-                    <div className="nav-item">
-                        <span></span> Laporan
-                    </div>
-                </nav>
-
-                <div className="sidebar-footer">
-                    <button onClick={handleLogout} className="btn-logout-sidebar">
-                        🚪 Logout
-                    </button>
-                </div>
-            </aside>
+        <div className="flex min-h-screen bg-gray-50 font-sans">
+            
+            {/* Panggil Komponen Sidebar Baru */}
+            <AdminSidebar user={user} />
 
             {/* MAIN CONTENT */}
-            <main className="admin-content">
-                <header className="admin-header">
-                    <h1>Dashboard Overview</h1>
-                    <div className="user-profile">
-                        <span>Halo, <b>{user.nama}</b></span>
-                        <div className="avatar-admin">{user.nama.charAt(0)}</div>
+            <main className="ml-[260px] flex-1 py-8 px-10">
+                <header className="flex justify-between items-center mb-8">
+                    <h1 className="text-2xl font-bold text-gray-800 m-0">Dashboard Overview</h1>
+                    <div className="flex items-center gap-4">
+                        <span className="text-gray-600">Halo, <b className="text-gray-800">{user.nama}</b></span>
+                        <div className="w-10 h-10 bg-gray-800 text-white rounded-full flex items-center justify-center font-bold text-lg">
+                            {user.nama.charAt(0)}
+                        </div>
                     </div>
                 </header>
 
-                <div className="stats-container">
-                    <div className="stat-card blue">
-                        <h3>{stats.totalUser}</h3>
-                        <p>Total User Aktif</p>
-                        <div className="icon-bg">👥</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+                    <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500 relative overflow-hidden">
+                        <h3 className="text-3xl font-bold text-gray-800 m-0">{stats.totalUser}</h3>
+                        <p className="text-gray-500 text-sm mt-2">Total User Aktif</p>
                     </div>
                     
                     {user.role === 'superadmin' && (
-                        <div className="stat-card purple">
-                            <h3>{stats.totalAdmin}</h3>
-                            <p>Total Admin</p>
-                            <div className="icon-bg">🛡️</div>
+                        <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-purple-500 relative overflow-hidden">
+                            <h3 className="text-3xl font-bold text-gray-800 m-0">{stats.totalAdmin}</h3>
+                            <p className="text-gray-500 text-sm mt-2">Total Admin</p>
                         </div>
                     )}
 
-                    <div className="stat-card orange">
-                        <h3>{stats.totalInvoice}</h3>
-                        <p>Total Invoice</p>
-                        <div className="icon-bg">📄</div>
+                    <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-orange-500 relative overflow-hidden">
+                        <h3 className="text-3xl font-bold text-gray-800 m-0">{stats.totalInvoice}</h3>
+                        <p className="text-gray-500 text-sm mt-2">Total Invoice</p>
                     </div>
 
-                    <div className="stat-card red">
-                        <h3>{stats.pendingInvoice}</h3>
-                        <p>Perlu Verifikasi</p>
-                        <div className="icon-bg">⏳</div>
+                    <div className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-red-500 relative overflow-hidden">
+                        <h3 className="text-3xl font-bold text-gray-800 m-0">{stats.pendingInvoice}</h3>
+                        <p className="text-gray-500 text-sm mt-2">Perlu Verifikasi</p>
                     </div>
                 </div>
 
-                <div className="recent-section">
-                    <h3>Aktivitas Terbaru</h3>
-                    <div className="empty-state-box">
+                <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-4">Aktivitas Terbaru</h3>
+                    <div className="bg-white p-10 rounded-xl text-center text-gray-400 border border-dashed border-gray-300">
                         <p>Belum ada aktivitas terbaru.</p>
                     </div>
                 </div>
