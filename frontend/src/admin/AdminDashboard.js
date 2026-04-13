@@ -107,7 +107,7 @@ const AdminDashboard = () => {
                         <span>🧾</span> Kelola Invoice
                     </div>
                     <div className="nav-item">
-                        <span>📈</span> Laporan
+                        <span></span> Laporan
                     </div>
                 </nav>
 
