@@ -7,14 +7,17 @@ require('./models/index');
 const authRoutes = require('./routes/authRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes'); 
 const paymentRoutes = require('./routes/paymentRoutes');
+const userRoutes = require('./routes/userRoutes');
 
-dotenv.config();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use('/public', express.static(path.join(__dirname, 'public')));
+
+app.use('/api/users', userRoutes);
+dotenv.config();
 
 app.use('/api/auth', authRoutes);
 app.use('/api/invoices', invoiceRoutes);

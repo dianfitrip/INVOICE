@@ -10,6 +10,9 @@ import ProfilePage from './user/ProfilePage';
 import AdminDashboard from './admin/AdminDashboard';
 import './App.css';
 
+import ManageUsers from './admin/ManageUsers';
+
+
 function App() {
   return (
     <Router>
@@ -27,6 +30,9 @@ function App() {
                 <AdminDashboard />
             </ProtectedRoute>
         } />
+
+        // Di dalam area Routes
+        <Route path="/admin/users" element={<ManageUsers />} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

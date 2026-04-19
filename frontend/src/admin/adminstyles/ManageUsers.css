@@ -1,0 +1,209 @@
+/* frontend/src/admin/adminstyles/ManageUsers.css */
+
+.manage-users-container {
+    padding: 20px 30px;
+    background-color: #f8f9fa; /* Warna background abu-abu sangat muda */
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* --- Bagian Header (Judul & Tombol Aksi Kanan) --- */
+.mu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.mu-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+    font-weight: 600;
+}
+
+.mu-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.mu-search-input {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 250px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.mu-search-input:focus {
+    border-color: #F7941E;
+    box-shadow: 0 0 5px rgba(247, 148, 30, 0.3);
+}
+
+/* --- Gaya Tombol Utama --- */
+.mu-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+
+.mu-btn-add {
+    background-color: #F7941E;
+    color: white;
+}
+
+.mu-btn-add:hover {
+    background-color: #e08316;
+}
+
+.mu-btn-outline {
+    background-color: white;
+    color: #555;
+    border: 1px solid #ddd;
+}
+
+.mu-btn-outline:hover {
+    background-color: #f1f1f1;
+}
+
+/* --- Container Form (Untuk Tambah/Edit) --- */
+.mu-form-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    margin-bottom: 25px;
+    border: 1px solid #eaeaea;
+}
+
+.mu-form-card h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #444;
+}
+
+.mu-form-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.mu-input {
+    flex: 1;
+    min-width: 180px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.mu-input:focus {
+    border-color: #F7941E;
+    outline: none;
+}
+
+/* --- Tabel Manajemen User --- */
+.mu-table-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    border: 1px solid #eaeaea;
+    overflow: hidden; /* Menjaga sudut melengkung */
+}
+
+.mu-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.mu-table th {
+    background-color: #fbfbfb;
+    padding: 16px 20px;
+    font-weight: 600;
+    color: #666;
+    font-size: 14px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.mu-table td {
+    padding: 16px 20px;
+    color: #444;
+    font-size: 14px;
+    border-bottom: 1px solid #eaeaea;
+    vertical-align: middle;
+}
+
+.mu-table tbody tr:hover {
+    background-color: #fdfdfd;
+}
+
+.mu-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* --- Badge Role --- */
+.mu-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-superadmin {
+    background-color: #e8f5e9;
+    color: #2e7d32; /* Hijau */
+}
+
+.badge-admin {
+    background-color: #fff3e0;
+    color: #ef6c00; /* Oranye */
+}
+
+.badge-user {
+    background-color: #e3f2fd;
+    color: #1565c0; /* Biru */
+}
+
+/* --- Tombol Aksi di dalam Tabel --- */
+.mu-action-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: 0.2s;
+}
+
+.mu-btn-edit {
+    background-color: #f0f4ff;
+    color: #4361ee;
+}
+
+.mu-btn-edit:hover {
+    background-color: #dce4ff;
+}
+
+.mu-btn-delete {
+    background-color: #ffeeee;
+    color: #d90429;
+}
+
+.mu-btn-delete:hover {
+    background-color: #ffd6d6;
+}
