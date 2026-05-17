@@ -8,10 +8,9 @@ import InvoicePage from './user/InvoicePage';
 import DetailInvoicePage from './user/DetailInvoicePage';
 import ProfilePage from './user/ProfilePage';
 import AdminDashboard from './admin/AdminDashboard';
-import './App.css';
-
 import ManageUsers from './admin/ManageUsers';
-
+import AdminLayout from './admin/AdminLayout'; // WAJIB DI-IMPORT AGAR SIDEBAR MUNCUL
+import './App.css';
 
 function App() {
   return (
@@ -25,14 +24,23 @@ function App() {
         <Route path="/invoice/:id" element={<DetailInvoicePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         
+        {/* Rute Admin Dashboard */}
         <Route path="/admin" element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
-                <AdminDashboard />
+                <AdminLayout>
+                    <AdminDashboard />
+                </AdminLayout>
             </ProtectedRoute>
         } />
 
-        // Di dalam area Routes
-        <Route path="/admin/users" element={<ManageUsers />} />
+        {/* Rute Kelola User (Hanya Superadmin) */}
+        <Route path="/admin/users" element={
+            <ProtectedRoute allowedRoles={['superadmin']}>
+                <AdminLayout>
+                    <ManageUsers />
+                </AdminLayout>
+            </ProtectedRoute>
+        } />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
@@ -40,10 +48,8 @@ function App() {
   );
 }
 
-// PERBAIKAN ADA DI SINI:
 const ProtectedRoute = ({ children, allowedRoles }) => {
-    // Ganti 'token' menjadi 'accessToken'
-    const token = localStorage.getItem('accessToken'); // <--- SUDAH DIPERBAIKI
+    const token = localStorage.getItem('accessToken'); 
     
     if (!token) return <Navigate to="/login" />;
     
