@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getUsers, createUser, updateUser, deleteUser } = require('../controllers/userController');
-const { verifyUser } = require('../middleware/authUser'); // Gunakan middleware auth milikmu
+const verifyUser = require('../middleware/authUser'); // PERBAIKAN: Hapus kurung kurawal {} di sini
 
 router.get('/', verifyUser, getUsers);
 router.post('/', verifyUser, createUser);
