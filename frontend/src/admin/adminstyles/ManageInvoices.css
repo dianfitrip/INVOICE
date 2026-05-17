@@ -1,0 +1,370 @@
+/* Layout & Container */
+.mi-container {
+    padding: 32px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.unauthorized-message {
+    padding: 24px;
+    text-align: center;
+    color: #ef4444;
+    font-weight: 600;
+    background: #fef2f2;
+    border-radius: 8px;
+    margin: 32px;
+}
+
+/* Header */
+.mi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+}
+
+.mi-header-title h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 8px 0;
+}
+
+.mi-header-title p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Toolbar & Search */
+.mi-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.mi-search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+}
+
+.mi-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+.mi-search-input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #334155;
+    background-color: #ffffff;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.mi-search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Table Design */
+.mi-table-container {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.mi-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.mi-table th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.mi-table td {
+    padding: 16px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.mi-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.mi-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.mi-text-main {
+    color: #0f172a;
+    font-weight: 500;
+}
+
+.mi-text-muted {
+    color: #64748b;
+}
+
+.mi-text-center {
+    text-align: center;
+    padding: 32px !important;
+    color: #94a3b8;
+}
+
+/* Badges for Invoice Status */
+.mi-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.mi-badge-success {
+    background-color: #ecfdf5;
+    color: #059669;
+}
+
+.mi-badge-warning {
+    background-color: #fffbeb;
+    color: #d97706;
+}
+
+.mi-badge-danger {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.mi-badge-secondary {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+/* Action Buttons (Table) */
+.mi-action-cell {
+    text-align: right;
+}
+
+.mi-btn-icon {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #64748b;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mi-btn-icon:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+.mi-btn-danger:hover {
+    background-color: #fef2f2;
+    color: #ef4444;
+}
+
+/* Modal Buttons */
+.mi-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #0f172a;
+    color: #ffffff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.mi-btn-primary:hover {
+    background-color: #1e293b;
+}
+
+.mi-btn-outline {
+    background-color: #ffffff;
+    color: #334155;
+    padding: 10px 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mi-btn-outline:hover {
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+}
+
+/* Pagination */
+.mi-pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.mi-page-btn {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mi-page-btn:not(:disabled):hover {
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+}
+
+.mi-page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f1f5f9;
+}
+
+.mi-page-info {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Modal UI */
+.mi-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.mi-modal-box {
+    background-color: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.mi-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.mi-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.mi-btn-close {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.mi-btn-close:hover {
+    color: #0f172a;
+}
+
+.mi-form {
+    padding: 24px;
+}
+
+.mi-form-group {
+    margin-bottom: 20px;
+}
+
+.mi-form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.mi-form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #0f172a;
+    box-sizing: border-box;
+    transition: all 0.2s;
+    appearance: none; /* Merapihkan panah select bawaan */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px top 50%;
+    background-size: 10px auto;
+}
+
+.mi-form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.mi-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+}

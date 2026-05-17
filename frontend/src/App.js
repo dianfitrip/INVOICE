@@ -9,6 +9,7 @@ import DetailInvoicePage from './user/DetailInvoicePage';
 import ProfilePage from './user/ProfilePage';
 import AdminDashboard from './admin/AdminDashboard';
 import ManageUsers from './admin/ManageUsers';
+import ManageInvoices from './admin/ManageInvoices'; // IMPORT HALAMAN KELOLA INVOICE
 import AdminLayout from './admin/AdminLayout'; // WAJIB DI-IMPORT AGAR SIDEBAR MUNCUL
 import './App.css';
 
@@ -16,8 +17,8 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Rute Publik & User */}
         <Route path="/" element={<HomePage />} />
-        
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/invoice" element={<InvoicePage />} />
@@ -42,6 +43,16 @@ function App() {
             </ProtectedRoute>
         } />
 
+        {/* Rute Kelola Invoice (Admin & Superadmin) */}
+        <Route path="/admin/invoices" element={
+            <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
+                <AdminLayout>
+                    <ManageInvoices />
+                </AdminLayout>
+            </ProtectedRoute>
+        } />
+
+        {/* Rute Fallback (Jika URL tidak ditemukan) */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
@@ -56,6 +67,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     try {
         const decoded = JSON.parse(atob(token.split('.')[1]));
         if (!allowedRoles.includes(decoded.role.toLowerCase())) {
+            // Jika role tidak sesuai, lemparkan kembali ke halaman utama
             return <Navigate to="/" />;
         }
     } catch (error) {

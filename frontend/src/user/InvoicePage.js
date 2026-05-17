@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from 'sweetalert2'; 
 import './userstyles/InvoicePage.css';
+
+// Daftar item yang disediakan oleh Admin
+const PREDEFINED_ITEMS = [
+    { label: "Pilih Item...", price: 0, isCustom: false },
+    { label: "Penerbitan Surat Jaminan", price: 150000, isCustom: false },
+    { label: "Legalisir Dokumen", price: 50000, isCustom: false },
+    { label: "Layanan Keanggotaan RJI", price: 300000, isCustom: false },
+    { label: "Lainnya (Custom)", price: 0, isCustom: true }
+];
 
 const InvoicePage = () => {
     const navigate = useNavigate();
     const [invoices, setInvoices] = useState([]);
     const [showModal, setShowModal] = useState(false);
     
-    // State untuk Form Tambah Invoice
     const [tanggal, setTanggal] = useState('');
     const [items, setItems] = useState([
-        { deskripsi: '', qty: 1, harga: 0 }
+        { tipe: '', deskripsi: '', qty: 1, harga: 0, isCustom: false }
     ]);
 
     useEffect(() => {
@@ -24,7 +32,7 @@ const InvoicePage = () => {
         if(!token) return navigate('/login');
 
         try {
-            const response = await fetch('http://localhost:5000/api/invoices', {
+            const response = await fetch('http://localhost:5000/api/invoices/my-invoices', { // Sesuaikan endpoint
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -32,16 +40,32 @@ const InvoicePage = () => {
                 setInvoices(data);
             }
         } catch (error) {
-            console.error(error);
             Swal.fire('Error', 'Gagal memuat data invoice', 'error');
         }
     };
 
     const handleAddItem = () => {
-        setItems([...items, { deskripsi: '', qty: 1, harga: 0 }]);
+        setItems([...items, { tipe: '', deskripsi: '', qty: 1, harga: 0, isCustom: false }]);
     };
 
-    const handleItemChange = (index, field, value) => {
+    const handleItemSelectChange = (index, selectedLabel) => {
+        const selectedObj = PREDEFINED_ITEMS.find(item => item.label === selectedLabel);
+        const newItems = [...items];
+        
+        newItems[index].tipe = selectedLabel;
+        newItems[index].isCustom = selectedObj?.isCustom || false;
+        
+        if (!newItems[index].isCustom) {
+            newItems[index].deskripsi = selectedLabel === "Pilih Item..." ? '' : selectedLabel;
+            newItems[index].harga = selectedObj?.price || 0;
+        } else {
+            newItems[index].deskripsi = '';
+            newItems[index].harga = 0;
+        }
+        setItems(newItems);
+    };
+
+    const handleItemTextChange = (index, field, value) => {
         const newItems = [...items];
         newItems[index][field] = value;
         setItems(newItems);
@@ -55,25 +79,23 @@ const InvoicePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // --- 1. VALIDASI INPUT (Cek Harga & Qty) ---
-        const isInvalidItem = items.some(item => item.harga <= 0 || item.qty <= 0);
+        const isInvalidItem = items.some(item => !item.deskripsi || item.harga <= 0 || item.qty <= 0);
         if (isInvalidItem) {
             return Swal.fire({
                 icon: 'warning',
                 title: 'Data Belum Lengkap',
-                text: 'Pastikan Harga dan Qty lebih dari 0.',
-                confirmButtonColor: '#F7941E'
+                text: 'Pastikan item telah dipilih/diisi beserta harga dan kuantitasnya.',
+                confirmButtonColor: '#0f172a'
             });
         }
 
-        // --- 2. KONFIRMASI SIMPAN ---
         const result = await Swal.fire({
             title: 'Buat Invoice Baru?',
-            text: "Pastikan data tanggal dan item sudah benar.",
+            text: "Pastikan data tagihan sudah benar.",
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#F7941E',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#0f172a',
+            cancelButtonColor: '#94a3b8',
             confirmButtonText: 'Ya, Simpan',
             cancelButtonText: 'Batal'
         });
@@ -81,7 +103,6 @@ const InvoicePage = () => {
         if (!result.isConfirmed) return;
 
         const token = localStorage.getItem('accessToken');
-
         try {
             const response = await fetch('http://localhost:5000/api/invoices', {
                 method: 'POST',
@@ -91,42 +112,26 @@ const InvoicePage = () => {
                 },
                 body: JSON.stringify({
                     tanggal_invoice: tanggal,
-                    items: items
+                    items: items.map(i => ({ deskripsi: i.deskripsi, qty: i.qty, harga: i.harga }))
                 })
             });
 
             if(response.ok) {
-                // --- 3. ALERT SUKSES ---
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Invoice berhasil dibuat.',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-
+                Swal.fire('Berhasil!', 'Invoice berhasil dibuat.', 'success');
                 setShowModal(false);
                 fetchInvoices();
-                // Reset Form
                 setTanggal('');
-                setItems([{ deskripsi: '', qty: 1, harga: 0 }]);
+                setItems([{ tipe: '', deskripsi: '', qty: 1, harga: 0, isCustom: false }]);
             } else {
-                // --- 4. ALERT GAGAL ---
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal',
-                    text: 'Terjadi kesalahan saat menyimpan invoice.',
-                    confirmButtonColor: '#d33'
-                });
+                Swal.fire('Gagal', 'Terjadi kesalahan saat menyimpan invoice.', 'error');
             }
         } catch (error) {
-            console.error(error);
             Swal.fire('Error', 'Gagal terhubung ke server', 'error');
         }
     };
 
     const formatRupiah = (number) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(number);
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(number || 0);
     };
 
     return (
@@ -160,7 +165,7 @@ const InvoicePage = () => {
                                         <td>{inv.tanggal_invoice}</td>
                                         <td className="text-orange fw-bold">{formatRupiah(inv.total)}</td>
                                         <td>
-                                            <span className={`status-badge ${inv.status.toLowerCase().replace(' ', '-')}`}>
+                                            <span className={`status-badge ${inv.status?.toLowerCase().replace(' ', '-')}`}>
                                                 {inv.status}
                                             </span>
                                         </td>
@@ -176,7 +181,6 @@ const InvoicePage = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    {/* Style dipindahkan ke CSS .empty-data-row */}
                                     <td colSpan="5" className="empty-data-row">
                                         Belum ada invoice. Silakan buat baru.
                                     </td>
@@ -187,10 +191,9 @@ const InvoicePage = () => {
                 </div>
             </div>
 
-            {/* MODAL BUAT INVOICE */}
             {showModal && (
                 <div className="modal-overlay">
-                    <div className="modal-content">
+                    <div className="modal-content" style={{ maxWidth: '600px' }}>
                         <div className="modal-header">
                             <h3>Buat Invoice Baru</h3>
                             <button className="close-btn" onClick={() => setShowModal(false)}>&times;</button>
@@ -208,49 +211,65 @@ const InvoicePage = () => {
                             </div>
 
                             <div className="items-section">
-                                {/* Style dipindahkan ke CSS .label-block */}
                                 <label className="label-block">Item Tagihan</label>
-                                
                                 {items.map((item, index) => (
-                                    <div key={index} className="item-row">
-                                        <input 
-                                            type="text" 
-                                            placeholder="Deskripsi"
-                                            // Style flex dipindahkan ke CSS .input-desc
-                                            className="form-input input-desc"
-                                            value={item.deskripsi}
-                                            onChange={(e) => handleItemChange(index, 'deskripsi', e.target.value)}
-                                            required
-                                        />
-                                        <input 
-                                            type="number" 
-                                            placeholder="Qty"
-                                            // Style flex dipindahkan ke CSS .input-qty
-                                            className="form-input input-qty"
-                                            min="1"
-                                            value={item.qty}
-                                            onChange={(e) => handleItemChange(index, 'qty', e.target.value)}
-                                            required
-                                        />
-                                        <input 
-                                            type="number" 
-                                            placeholder="Harga"
-                                            // Style flex dipindahkan ke CSS .input-price
-                                            className="form-input input-price"
-                                            min="0"
-                                            value={item.harga}
-                                            onChange={(e) => handleItemChange(index, 'harga', e.target.value)}
-                                            required
-                                        />
-                                        {items.length > 1 && (
-                                            <button type="button" className="btn-remove" onClick={() => handleRemoveItem(index)} title="Hapus Item">×</button>
+                                    <div key={index} style={{ marginBottom: '16px', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                                            <select 
+                                                className="form-input" 
+                                                style={{ flex: 1 }}
+                                                value={item.tipe}
+                                                onChange={(e) => handleItemSelectChange(index, e.target.value)}
+                                                required
+                                            >
+                                                {PREDEFINED_ITEMS.map((opts, i) => (
+                                                    <option key={i} value={opts.label}>{opts.label}</option>
+                                                ))}
+                                            </select>
+                                            {items.length > 1 && (
+                                                <button type="button" className="btn-remove" onClick={() => handleRemoveItem(index)} title="Hapus Item">×</button>
+                                            )}
+                                        </div>
+
+                                        {item.isCustom && (
+                                            <input 
+                                                type="text" 
+                                                className="form-input" 
+                                                style={{ marginBottom: '8px', width: '100%', boxSizing: 'border-box' }}
+                                                placeholder="Deskripsi Item Custom"
+                                                value={item.deskripsi}
+                                                onChange={(e) => handleItemTextChange(index, 'deskripsi', e.target.value)}
+                                                required
+                                            />
                                         )}
+
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <input 
+                                                type="number" 
+                                                className="form-input input-qty" 
+                                                placeholder="Qty"
+                                                min="1"
+                                                value={item.qty}
+                                                onChange={(e) => handleItemTextChange(index, 'qty', e.target.value)}
+                                                required
+                                            />
+                                            <input 
+                                                type="number" 
+                                                className="form-input input-price" 
+                                                placeholder="Harga"
+                                                min="0"
+                                                value={item.harga}
+                                                onChange={(e) => handleItemTextChange(index, 'harga', e.target.value)}
+                                                disabled={!item.isCustom} 
+                                                required
+                                            />
+                                        </div>
                                     </div>
                                 ))}
-                                <button type="button" className="btn-add-item" onClick={handleAddItem}>+ Tambah Item</button>
+                                <button type="button" className="btn-add-item" onClick={handleAddItem} style={{ marginTop: '8px' }}>+ Tambah Item</button>
                             </div>
 
-                            <button type="submit" className="btn-submit-modal">Simpan Invoice</button>
+                            <button type="submit" className="btn-submit-modal" style={{ marginTop: '20px', width: '100%' }}>Simpan Invoice</button>
                         </form>
                     </div>
                 </div>
