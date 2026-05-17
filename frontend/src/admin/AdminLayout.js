@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
-import './adminstyles/AdminDashboard.css'; // Menggunakan style yang sudah ada
+import './adminstyles/AdminDashboard.css';
 
 const AdminLayout = ({ children }) => {
     const navigate = useNavigate();
@@ -26,7 +26,7 @@ const AdminLayout = ({ children }) => {
         }
     }, [navigate]);
 
-    if (!user) return null; // Tunggu data user diload sebelum render
+    if (!user) return null;
 
     return (
         <div className="admin-layout">
@@ -41,9 +41,8 @@ const AdminLayout = ({ children }) => {
                         </div>
                     </div>
                 </header>
-                {/* Konten Halaman akan dirender di sini */}
                 <div className="page-content">
-                    {children} 
+                    {children}
                 </div>
             </main>
         </div>
