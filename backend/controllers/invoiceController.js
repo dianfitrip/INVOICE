@@ -143,3 +143,24 @@ exports.deleteInvoice = async (req, res) => {
         res.status(500).json({ msg: "Gagal menghapus invoice." });
     }
 };
+
+// UNGGAH BUKTI PEMBAYARAN (DARI SISI USER)
+exports.uploadBuktiPembayaran = async (req, res) => {
+    try {
+        const invoice = await Invoice.findOne({ where: { id_invoice: req.params.id, id_user: req.userId } });
+
+        if (!invoice) return res.status(404).json({ msg: "Invoice tidak ditemukan atau bukan milik Anda" });
+        if (!req.file) return res.status(400).json({ msg: "Tidak ada file bukti yang diunggah" });
+
+        // Update status menjadi Menunggu Verifikasi & simpan nama file
+        await invoice.update({
+            bukti_pembayaran: req.file.filename,
+            status: 'Menunggu Verifikasi'
+        });
+
+        res.json({ msg: "Bukti pembayaran berhasil diunggah", data: invoice });
+    } catch (error) {
+        console.error("Error upload bukti:", error);
+        res.status(500).json({ msg: "Gagal mengunggah bukti pembayaran" });
+    }
+};

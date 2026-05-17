@@ -280,8 +280,8 @@ const ManageInvoices = () => {
             ========================================= */}
             {showDetailModal && selectedInvoice && (
                 <div className="mi-modal-overlay">
-                    <div className="mi-modal-box" style={{ maxWidth: '700px' }}>
-                        <div className="mi-modal-header">
+                    <div className="mi-modal-box" style={{ maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <div className="mi-modal-header" style={{ position: 'sticky', top: 0, backgroundColor: '#fff', zIndex: 10 }}>
                             <h3>Rincian Lengkap Invoice</h3>
                             <button className="mi-btn-close" onClick={() => setShowDetailModal(false)}>&times;</button>
                         </div>
@@ -306,7 +306,7 @@ const ManageInvoices = () => {
                             </div>
 
                             <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#0f172a' }}>Daftar Item Tagihan</h4>
-                            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+                            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden', marginBottom: '24px' }}>
                                 <table width="100%" style={{ borderCollapse: 'collapse', fontSize: '14px' }}>
                                     <thead>
                                         <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: 'left' }}>
@@ -336,6 +336,27 @@ const ManageInvoices = () => {
                                     </tbody>
                                 </table>
                             </div>
+
+                            {/* FITUR BARU: TAMPILKAN BUKTI PEMBAYARAN JIKA ADA */}
+                            {selectedInvoice.bukti_pembayaran ? (
+                                <div>
+                                    <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#0f172a' }}>Bukti Pembayaran (Unggahan User)</h4>
+                                    <div style={{ border: '1px solid #e2e8f0', padding: '8px', borderRadius: '8px', backgroundColor: '#f8fafc', textAlign: 'center' }}>
+                                        <a href={`http://localhost:5000/uploads/${selectedInvoice.bukti_pembayaran}`} target="_blank" rel="noreferrer">
+                                            <img 
+                                                src={`http://localhost:5000/uploads/${selectedInvoice.bukti_pembayaran}`} 
+                                                alt="Bukti Pembayaran" 
+                                                style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '4px' }} 
+                                            />
+                                        </a>
+                                        <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>*Klik gambar untuk memperbesar</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{ backgroundColor: '#fef2f2', color: '#ef4444', padding: '12px', borderRadius: '8px', fontSize: '13px', textAlign: 'center' }}>
+                                    User belum mengunggah bukti pembayaran.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

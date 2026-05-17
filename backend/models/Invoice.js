@@ -24,8 +24,13 @@ const Invoice = db.define('Invoice', {
         allowNull: false
     },
     status: {
-        type: DataTypes.ENUM('Belum Dibayar', 'Menunggu Verifikasi', 'Dibayar'),
+        // Pastikan ENUM ini sama dengan yang ada di database Anda (Lunas / Dibayar)
+        type: DataTypes.ENUM('Belum Dibayar', 'Menunggu Verifikasi', 'Lunas', 'Dibatalkan'),
         defaultValue: 'Belum Dibayar'
+    },
+    bukti_pembayaran: { // PENAMBAHAN KOLOM BARU
+        type: DataTypes.STRING,
+        allowNull: true
     },
     created_at: {
         type: DataTypes.DATE,

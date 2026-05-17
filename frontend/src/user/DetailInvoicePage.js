@@ -11,7 +11,9 @@ const DetailInvoicePage = () => {
     const [invoice, setInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
     
-    // Ref untuk menandai elemen kertas dokumen yang akan dikonversi ke PDF
+    const [fileBukti, setFileBukti] = useState(null); // State untuk file bukti
+    const [isUploading, setIsUploading] = useState(false);
+
     const documentRef = useRef(null);
 
     useEffect(() => {
@@ -41,23 +43,49 @@ const DetailInvoicePage = () => {
         }
     };
 
-    // Fungsi Utama untuk Unduh PDF secara Otomatis
+    // Fungsi Submit Bukti Pembayaran
+    const handleUploadBukti = async (e) => {
+        e.preventDefault();
+        if (!fileBukti) return Swal.fire('Peringatan', 'Silakan pilih file gambar bukti transfer terlebih dahulu.', 'warning');
+
+        const formData = new FormData();
+        formData.append('bukti', fileBukti);
+
+        const token = localStorage.getItem('accessToken');
+        setIsUploading(true);
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/invoices/${id}/upload-bukti`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData // Jangan set Content-Type, biarkan browser yang atur boundary multipartnya otomatis
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                Swal.fire('Berhasil!', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi admin.', 'success');
+                fetchInvoiceDetail(); // Refresh data untuk mengubah UI ke 'Menunggu Verifikasi'
+            } else {
+                Swal.fire('Gagal', data.msg || 'Gagal mengunggah bukti', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Koneksi server terputus', 'error');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     const handleDownloadPDF = () => {
         const element = documentRef.current;
-        const filename = invoice?.status === 'Lunas' 
+        const filename = invoice?.status === 'Lunas' || invoice?.status === 'Dibayar'
             ? `Kwitansi-${invoice.Kwitansi?.nomor_kwitansi || invoice.nomor_invoice}.pdf`
             : `Invoice-${invoice.nomor_invoice}.pdf`;
 
-        // Konfigurasi Kertas dan Kualitas Output PDF
         const options = {
-            margin:       [10, 10, 10, 10],
-            filename:     filename,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true }, // scale 2 agar teks tajam tidak pecah
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            margin: [10, 10, 10, 10], filename: filename, image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
-
-        // Eksekusi pembuatan dan pengunduhan file
         html2pdf().set(options).from(element).save();
     };
 
@@ -66,7 +94,8 @@ const DetailInvoicePage = () => {
 
     const getStatusColor = (status) => {
         switch (status?.toLowerCase()) {
-            case 'lunas': return '#059669'; 
+            case 'lunas': 
+            case 'dibayar': return '#059669'; 
             case 'menunggu verifikasi': return '#d97706'; 
             case 'dibatalkan': return '#dc2626'; 
             default: return '#475569'; 
@@ -76,38 +105,70 @@ const DetailInvoicePage = () => {
     if (loading) return <div style={{textAlign:'center', padding:'50px'}}>Memuat Dokumen...</div>;
     if (!invoice) return null;
 
-    const isLunas = invoice.status === 'Lunas';
+    const isLunas = invoice.status === 'Lunas' || invoice.status === 'Dibayar';
+    const isMenunggu = invoice.status === 'Menunggu Verifikasi';
 
     return (
         <div className="dip-background">
             <Navbar />
 
             <div className="dip-main-container">
-                {/* TOOLBAR KONTROL */}
                 <div className="dip-toolbar">
-                    <button className="dip-btn-back" onClick={() => navigate('/invoice')}>
-                        &larr; Kembali
-                    </button>
-                    
+                    <button className="dip-btn-back" onClick={() => navigate('/invoice')}>&larr; Kembali</button>
                     <div className="dip-toolbar-actions">
-                        {isLunas && invoice.Kwitansi && (
+                        {isLunas && (
                             <button className="dip-btn-success" onClick={handleDownloadPDF}>
-                                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                 Unduh Kwitansi (PDF)
                             </button>
                         )}
                         {!isLunas && (
                             <button className="dip-btn-primary" onClick={handleDownloadPDF}>
-                                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                 Unduh Tagihan (PDF)
                             </button>
                         )}
                     </div>
                 </div>
 
+                {/* FORM UNGGAH BUKTI (HANYA MUNCUL JIKA BELUM DIBAYAR) */}
+                {invoice.status === 'Belum Dibayar' && (
+                    <div style={{ backgroundColor: '#fff', padding: '24px', borderRadius: '12px', marginBottom: '24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                        <h3 style={{ margin: '0 0 16px 0', fontSize: '18px' }}>Konfirmasi Pembayaran</h3>
+                        <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '16px' }}>
+                            Silakan lakukan pembayaran sebesar <strong>{formatRupiah(invoice.total)}</strong>. Setelah transfer, unggah bukti struk Anda di bawah ini agar admin dapat memverifikasinya.
+                        </p>
+                        <form onSubmit={handleUploadBukti} style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                            <input 
+                                type="file" 
+                                accept="image/png, image/jpeg, image/jpg" 
+                                onChange={(e) => setFileBukti(e.target.files[0])}
+                                style={{ flex: 1, padding: '10px', border: '1px dashed #cbd5e1', borderRadius: '8px', cursor: 'pointer' }}
+                            />
+                            <button 
+                                type="submit" 
+                                className="dip-btn-success" 
+                                disabled={isUploading}
+                                style={{ opacity: isUploading ? 0.7 : 1 }}
+                            >
+                                {isUploading ? 'Mengunggah...' : 'Kirim Bukti Pembayaran'}
+                            </button>
+                        </form>
+                    </div>
+                )}
+
+                {/* PESAN MENUNGGU VERIFIKASI */}
+                {isMenunggu && (
+                    <div style={{ backgroundColor: '#fffbeb', color: '#b45309', padding: '16px 24px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #fcd34d', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <div>
+                            <strong style={{ display: 'block', fontSize: '15px' }}>Bukti Pembayaran Terkirim</strong>
+                            <span style={{ fontSize: '13px' }}>Harap tunggu, tim kami sedang memverifikasi pembayaran Anda. Kwitansi akan diterbitkan setelah diverifikasi.</span>
+                        </div>
+                    </div>
+                )}
+
                 {/* KERTAS DOKUMEN YANG AKAN DI-DOWNLOAD */}
                 <div className="dip-document-paper" ref={documentRef}>
-                    {/* Header Dokumen */}
+                   {/* ... (Isi kertas dokumen INVOICE persis sama dengan kodingan sebelumnya) ... */}
                     <div className="dip-doc-header">
                         <div className="dip-doc-brand">
                             <img src="/logorji.png" alt="Logo RJI" className="dip-brand-logo" />
@@ -126,7 +187,6 @@ const DetailInvoicePage = () => {
 
                     <div className="dip-divider"></div>
 
-                    {/* Informasi Info */}
                     <div className="dip-doc-info-row">
                         <div className="dip-info-block">
                             <span className="dip-info-label">DITAGIHKAN KEPADA:</span>
@@ -135,7 +195,6 @@ const DetailInvoicePage = () => {
                             </strong>
                             <p style={{ margin: 0, fontSize: '14px', color: '#475569' }}>{invoice.User?.email || '-'}</p>
                         </div>
-
                         <div className="dip-info-block dip-text-right">
                             <table className="dip-info-table" style={{ marginLeft: 'auto' }}>
                                 <tbody>
@@ -164,7 +223,6 @@ const DetailInvoicePage = () => {
                         </div>
                     </div>
 
-                    {/* Tabel Rincian */}
                     <table className="dip-items-table">
                         <thead>
                             <tr>
@@ -190,7 +248,6 @@ const DetailInvoicePage = () => {
                         </tbody>
                     </table>
 
-                    {/* Total Akhir */}
                     <div className="dip-doc-footer">
                         <div className="dip-notes" style={{ maxWidth: '55%', fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>
                             {isLunas ? (
@@ -207,12 +264,7 @@ const DetailInvoicePage = () => {
                         </div>
                     </div>
                     
-                    {/* Cap Air Lunas */}
-                    {isLunas && (
-                        <div className="dip-stamp-paid">
-                            LUNAS
-                        </div>
-                    )}
+                    {isLunas && <div className="dip-stamp-paid">LUNAS</div>}
                 </div>
             </div>
         </div>
