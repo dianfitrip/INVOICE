@@ -75,13 +75,15 @@ exports.getAllInvoices = async (req, res) => {
 };
 
 // READ: GET 1 INVOICE BY ID (Fungsi yang sebelumnya terhapus)
+// READ: GET 1 INVOICE BY ID (Ditambah relasi Kwitansi)
 exports.getInvoiceById = async (req, res) => {
     try {
         const invoice = await Invoice.findOne({
             where: { id_invoice: req.params.id },
             include: [
                 { model: InvoiceItem, as: 'items' },
-                { model: User, attributes: ['nama', 'email'] }
+                { model: User, attributes: ['nama', 'email'] },
+                { model: Kwitansi } // PENAMBAHAN: Ambil data kwitansi jika ada
             ]
         });
 

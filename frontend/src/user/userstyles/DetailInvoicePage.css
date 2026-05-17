@@ -1,246 +1,174 @@
-.invoice-page-bg {
-  background-color: #f8f9fa;
-  min-height: 100vh;
+.dip-background {
+    background-color: #f1f5f9;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    padding-bottom: 60px;
 }
 
-.main-content-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 30px;
-  width: 100%;
+.dip-main-container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.detail-layout {
-  display: flex;
-  gap: 30px;
-  flex-wrap: wrap;
-  align-items: flex-start;
+/* Toolbar Controls */
+.dip-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 0;
 }
 
-.detail-card {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+.dip-btn-back {
+    background: transparent;
+    border: none;
+    color: #475569;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s;
 }
 
-.left-panel {
-  flex: 2;
+.dip-btn-back:hover {
+    color: #0f172a;
 }
 
-.right-panel {
-  flex: 1;
-  min-width: 300px;
-  height: fit-content;
+.dip-toolbar-actions {
+    display: flex;
+    gap: 12px;
 }
 
-.btn-back {
-  margin-bottom: 20px;
-  cursor: pointer;
-  padding: 8px 15px;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 6px;
-  color: #555;
-  transition: all 0.2s;
-  display: inline-block;
+.dip-btn-success, .dip-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    transition: 0.2s;
 }
 
-.btn-back:hover {
-  background-color: #f1f1f1;
+.dip-btn-success { background-color: #059669; }
+.dip-btn-success:hover { background-color: #047857; }
+.dip-btn-primary { background-color: #0f172a; }
+.dip-btn-primary:hover { background-color: #1e293b; }
+
+/* Kertas Kertas Dokumen */
+.dip-document-paper {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
 }
 
-.invoice-header {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 15px;
-  margin-bottom: 20px;
+/* Header */
+.dip-doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
-.invoice-title {
-  margin: 0;
-  color: #333;
-  font-size: 24px;
+.dip-doc-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
-.status-badge {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 600;
-  display: inline-block;
-  margin-top: 10px;
+.dip-brand-logo {
+    width: 55px;
+    height: auto;
 }
 
-.status-badge.belum-dibayar {
-  background-color: #ffebee;
-  color: #c62828;
+.dip-doc-brand h2 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    color: #0f172a;
+    font-weight: 700;
 }
 
-.status-badge.menunggu-verifikasi {
-  background-color: #fff3e0;
-  color: #f57f17;
+.dip-doc-brand p {
+    margin: 0;
+    font-size: 13px;
+    color: #64748b;
 }
 
-.status-badge.dibayar {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+.dip-doc-title {
+    text-align: right;
 }
 
-.panel-title {
-  margin-top: 0;
-  color: #333;
-  margin-bottom: 20px;
-  font-size: 18px;
+.dip-doc-title h1 {
+    margin: 0 0 6px 0;
+    font-size: 22px;
+    color: #0f172a;
+    letter-spacing: 0.5px;
+    font-weight: 700;
 }
 
-.invoice-table {
-  width: 100%;
-  border-collapse: collapse;
+.dip-status-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
-.invoice-table th {
-  text-align: left;
-  padding: 12px;
-  border-bottom: 2px solid #eee;
-  color: #666;
-  font-size: 14px;
+.dip-divider {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 24px 0;
 }
 
-.invoice-table td {
-  padding: 12px;
-  border-bottom: 1px solid #eee;
-  color: #333;
-  font-size: 14px;
+/* Info Row Layout */
+.dip-doc-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
 }
 
-.text-right { text-align: right; }
-.fw-bold { font-weight: bold; }
-.pt-20 { padding-top: 20px; }
-
-.total-amount {
-  padding-top: 20px;
-  font-size: 20px;
-  color: #F7941E;
-  font-weight: bold;
+.dip-info-block {
+    width: 48%;
 }
 
-.input-label {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #555;
+.dip-info-label {
+    display: block;
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
 }
 
-.input-helper {
-  font-size: 13px;
-  color: #666;
-  margin-top: -5px;
-  margin-bottom: 10px;
-  line-height: 1.4;
+/* Tables */
+.dip-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
 }
 
-.input-helper b {
-  color: #333;
+.dip-items-table th {
+    font-weight: 600;
 }
 
-.form-input {
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: border 0.2s;
-}
-
-.form-input:focus {
-  border-color: #F7941E;
-  outline: none;
-}
-
-.full-width {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.mb-15 { margin-bottom: 15px; }
-.mb-20 { margin-bottom: 20px; }
-
-.preview-wrapper {
-  animation: fadeIn 0.3s ease;
-}
-
-.preview-box {
-  margin-top: 10px;
-  text-align: center;
-  border: 1px dashed #ddd;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-.preview-box img {
-  max-height: 150px;
-  max-width: 100%;
-  border-radius: 4px;
-}
-
-.btn-remove-file {
-  background-color: #ffebee;
-  color: #c62828;
-  border: 1px solid #ffcdd2;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 10px;
-  width: 100%;
-  font-size: 13px;
-  font-weight: 600;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-}
-
-.btn-remove-file:hover {
-  background-color: #ffcdd2;
-}
-
-.btn-submit-payment {
-  width: 100%;
-  padding: 12px;
-  background-color: #F7941E;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 10px;
-}
-
-.btn-submit-payment:hover {
-  background-color: #e08213;
-}
-
-.payment-status-message {
-  text-align: center;
-  color: #666;
-  padding: 20px 0;
-}
-
-.status-icon {
-  font-size: 40px;
-  margin-bottom: 10px;
-}
-
-.loading-state {
-  text-align: center;
-  padding: 50px;
-  color: #888;
-  font-size: 18px;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Stamp Lunas Transparent Air */
+.dip-stamp-paid {
+    position: absolute;
+    top: 52%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    font-size: 80px;
+    color: rgba(5, 150, 105, 0.08);
+    font-weight: 900;
+    letter-spacing: 8px;
+    border: 6px solid rgba(5, 150, 105, 0.08);
+    border-radius: 12px;
+    padding: 12px 32px;
+    pointer-events: none;
+    z-index: 0;
 }
