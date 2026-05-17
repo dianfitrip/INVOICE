@@ -24,6 +24,16 @@ const icons = {
             <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
         </svg>
     ),
+    items: ( // ICON BARU UNTUK KELOLA ITEM
+        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+    ),
     report: (
         <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
             <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
@@ -94,6 +104,12 @@ const AdminSidebar = ({ user }) => {
                 <Link to="/admin/invoices" className={`nav-link ${isActive('/admin/invoices') ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
                     <span className="nav-icon">{icons.invoice}</span>
                     Kelola Invoice
+                </Link>
+
+                {/* PENAMBAHAN MENU KELOLA ITEM */}
+                <Link to="/admin/items" className={`nav-link ${isActive('/admin/items') ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+                    <span className="nav-icon">{icons.items}</span>
+                    Kelola Item
                 </Link>
 
                 <span className="nav-section-label">Analitik</span>

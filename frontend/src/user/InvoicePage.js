@@ -4,18 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2'; 
 import './userstyles/InvoicePage.css';
 
-// Daftar item yang disediakan oleh Admin
-const PREDEFINED_ITEMS = [
-    { label: "Pilih Item...", price: 0, isCustom: false },
-    { label: "Penerbitan Surat Jaminan", price: 150000, isCustom: false },
-    { label: "Legalisir Dokumen", price: 50000, isCustom: false },
-    { label: "Layanan Keanggotaan RJI", price: 300000, isCustom: false },
-    { label: "Lainnya (Custom)", price: 0, isCustom: true }
-];
-
 const InvoicePage = () => {
     const navigate = useNavigate();
     const [invoices, setInvoices] = useState([]);
+    const [predefinedItems, setPredefinedItems] = useState([]); // State dinamis item
     const [showModal, setShowModal] = useState(false);
     
     const [tanggal, setTanggal] = useState('');
@@ -25,6 +17,7 @@ const InvoicePage = () => {
 
     useEffect(() => {
         fetchInvoices();
+        fetchCatalogItems();
     }, []);
 
     const fetchInvoices = async () => {
@@ -32,7 +25,7 @@ const InvoicePage = () => {
         if(!token) return navigate('/login');
 
         try {
-            const response = await fetch('http://localhost:5000/api/invoices/my-invoices', { // Sesuaikan endpoint
+            const response = await fetch('http://localhost:5000/api/invoices/my-invoices', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -44,12 +37,38 @@ const InvoicePage = () => {
         }
     };
 
+    const fetchCatalogItems = async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch('http://localhost:5000/api/items', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            
+            if(response.ok) {
+                const formattedItems = data.map(item => ({
+                    label: item.nama_item,
+                    price: item.harga,
+                    isCustom: false
+                }));
+                
+                setPredefinedItems([
+                    { label: "Pilih Item...", price: 0, isCustom: false },
+                    ...formattedItems,
+                    { label: "Lainnya (Custom)", price: 0, isCustom: true }
+                ]);
+            }
+        } catch (error) {
+            console.error("Gagal load katalog", error);
+        }
+    };
+
     const handleAddItem = () => {
         setItems([...items, { tipe: '', deskripsi: '', qty: 1, harga: 0, isCustom: false }]);
     };
 
     const handleItemSelectChange = (index, selectedLabel) => {
-        const selectedObj = PREDEFINED_ITEMS.find(item => item.label === selectedLabel);
+        const selectedObj = predefinedItems.find(item => item.label === selectedLabel);
         const newItems = [...items];
         
         newItems[index].tipe = selectedLabel;
@@ -222,7 +241,8 @@ const InvoicePage = () => {
                                                 onChange={(e) => handleItemSelectChange(index, e.target.value)}
                                                 required
                                             >
-                                                {PREDEFINED_ITEMS.map((opts, i) => (
+                                                {/* PENGGUNAAN STATE DINAMIS */}
+                                                {predefinedItems.map((opts, i) => (
                                                     <option key={i} value={opts.label}>{opts.label}</option>
                                                 ))}
                                             </select>

@@ -3,17 +3,11 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import './adminstyles/ManageInvoices.css';
 
-const PREDEFINED_ITEMS = [
-    { label: "Pilih Item...", price: 0, isCustom: false },
-    { label: "Penerbitan Surat Jaminan", price: 150000, isCustom: false },
-    { label: "Legalisir Dokumen", price: 50000, isCustom: false },
-    { label: "Layanan Keanggotaan RJI", price: 300000, isCustom: false },
-    { label: "Lainnya (Custom)", price: 0, isCustom: true }
-];
-
 const ManageInvoices = () => {
     const [invoices, setInvoices] = useState([]);
     const [usersList, setUsersList] = useState([]); 
+    const [predefinedItems, setPredefinedItems] = useState([]); // State untuk item dinamis
+
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     
@@ -29,18 +23,20 @@ const ManageInvoices = () => {
     const userRole = localStorage.getItem('role'); 
     const API_URL = 'http://localhost:5000/api/invoices'; 
     const USER_API_URL = 'http://localhost:5000/api/users'; 
+    const ITEM_API_URL = 'http://localhost:5000/api/items'; 
 
     useEffect(() => {
         if (userRole === 'admin' || userRole === 'superadmin') {
             fetchInvoicesData();
             fetchUsersList(); 
+            fetchCatalogItems(); // Tarik data item dari DB
         }
     }, [search, userRole]);
 
     const fetchInvoicesData = async () => {
         try {
             const token = localStorage.getItem('accessToken'); 
-            const response = await axios.get(`${API_URL}?search=${search}`, { // Sesuaikan endpoint pencarian backend jika perlu
+            const response = await axios.get(`${API_URL}?search=${search}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setInvoices(Array.isArray(response.data) ? response.data : []);
@@ -58,6 +54,28 @@ const ManageInvoices = () => {
             setUsersList(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error("Gagal memuat list user");
+        }
+    };
+
+    // FUNGSI UNTUK MENARIK DATA ITEM DINAMIS
+    const fetchCatalogItems = async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const res = await axios.get(ITEM_API_URL, { headers: { Authorization: `Bearer ${token}` }});
+            
+            const formattedItems = res.data.map(item => ({
+                label: item.nama_item,
+                price: item.harga,
+                isCustom: false
+            }));
+
+            setPredefinedItems([
+                { label: "Pilih Item...", price: 0, isCustom: false },
+                ...formattedItems,
+                { label: "Lainnya (Custom)", price: 0, isCustom: true }
+            ]);
+        } catch (error) {
+            console.error("Gagal memuat item katalog", error);
         }
     };
 
@@ -115,9 +133,9 @@ const ManageInvoices = () => {
         });
     };
 
-    // FORM CREATE INVOICE LOGIC
+    // LOGIKA PEMILIHAN ITEM
     const handleItemSelectChange = (index, selectedLabel) => {
-        const selectedObj = PREDEFINED_ITEMS.find(item => item.label === selectedLabel);
+        const selectedObj = predefinedItems.find(item => item.label === selectedLabel);
         const newItems = [...items];
         newItems[index].tipe = selectedLabel;
         newItems[index].isCustom = selectedObj?.isCustom || false;
@@ -238,7 +256,13 @@ const ManageInvoices = () => {
                 </table>
             </div>
 
-            {/* Pagination Logic ... */}
+            {totalPages > 1 && (
+                <div className="mi-pagination">
+                    <button className="mi-page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}>Sebelumnya</button>
+                    <span className="mi-page-info">Halaman {currentPage} dari {totalPages}</span>
+                    <button className="mi-page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}>Selanjutnya</button>
+                </div>
+            )}
             
             {/* Modal Tambah Invoice */}
             {showCreateModal && (
@@ -267,7 +291,8 @@ const ManageInvoices = () => {
                                     <div key={index} style={{ padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', marginBottom: '12px' }}>
                                         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                                             <select style={{ flex: 1 }} value={item.tipe} onChange={(e) => handleItemSelectChange(index, e.target.value)} required>
-                                                {PREDEFINED_ITEMS.map((opts, i) => <option key={i} value={opts.label}>{opts.label}</option>)}
+                                                {/* PENGGUNAAN STATE DINAMIS */}
+                                                {predefinedItems.map((opts, i) => <option key={i} value={opts.label}>{opts.label}</option>)}
                                             </select>
                                             {items.length > 1 && <button type="button" onClick={() => setItems(items.filter((_, i) => i !== index))} style={{ padding: '8px', color: '#ef4444', border: 'none', background: 'none', cursor: 'pointer' }}>✖</button>}
                                         </div>
@@ -278,7 +303,7 @@ const ManageInvoices = () => {
                                         </div>
                                     </div>
                                 ))}
-                                <button type="button" onClick={() => setItems([...items, { tipe: '', deskripsi: '', qty: 1, harga: 0, isCustom: false }])} style={{ padding: '8px 12px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer' }}>+ Tambah Item</button>
+                                <button type="button" onClick={() => setItems([...items, { tipe: '', deskripsi: '', qty: 1, harga: 0, isCustom: false }])} style={{ padding: '8px 12px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', color: '#0f172a' }}>+ Tambah Item</button>
                             </div>
 
                             <div className="mi-modal-actions">
