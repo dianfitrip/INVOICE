@@ -63,7 +63,7 @@ exports.getAllInvoices = async (req, res) => {
         const invoices = await Invoice.findAll({
             include: [
                 { model: InvoiceItem, as: 'items' },
-                { model: User, attributes: ['nama', 'email'] } // Perbaikan: Menghilangkan alias 'as' jika memicu bentrokan relasi
+                { model: User, attributes: ['nama', 'email'] }
             ],
             order: [['created_at', 'DESC']]
         });
@@ -71,6 +71,26 @@ exports.getAllInvoices = async (req, res) => {
     } catch (error) {
         console.error("Error getAllInvoices:", error);
         res.status(500).json({ msg: "Gagal mengambil seluruh data invoice" });
+    }
+};
+
+// READ: GET 1 INVOICE BY ID (Fungsi yang sebelumnya terhapus)
+exports.getInvoiceById = async (req, res) => {
+    try {
+        const invoice = await Invoice.findOne({
+            where: { id_invoice: req.params.id },
+            include: [
+                { model: InvoiceItem, as: 'items' },
+                { model: User, attributes: ['nama', 'email'] }
+            ]
+        });
+
+        if(!invoice) return res.status(404).json({msg: "Invoice tidak ditemukan"});
+        
+        res.json(invoice);
+    } catch (error) {
+        console.error("Error getInvoiceById:", error);
+        res.status(500).json({ msg: "Server Error" });
     }
 };
 
@@ -84,6 +104,7 @@ exports.updateInvoiceStatus = async (req, res) => {
 
         await invoice.update({ status });
 
+        // Generate Kwitansi otomatis jika status menjadi Lunas
         if (status === 'Lunas') {
             const existingKwitansi = await Kwitansi.findOne({ where: { id_invoice: invoice.id_invoice } });
             

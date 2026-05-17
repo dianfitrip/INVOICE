@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import './adminstyles/ManageInvoices.css'; // Kita pinjam CSS yang sudah rapi ini
+import './adminstyles/ManageInvoices.css'; 
 
 const ManageItems = () => {
     const [items, setItems] = useState([]);
@@ -9,6 +9,10 @@ const ManageItems = () => {
     const [isEdit, setIsEdit] = useState(false);
     const [currentItemId, setCurrentItemId] = useState(null);
     const [formData, setFormData] = useState({ nama_item: '', harga: '' });
+
+    // MODIFIKASI: State untuk Detail Item Katalog
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedItem, setSelectedItem] = useState(null);
 
     const API_URL = 'http://localhost:5000/api/items';
     const userRole = localStorage.getItem('role');
@@ -39,6 +43,12 @@ const ManageItems = () => {
             setFormData({ nama_item: '', harga: '' });
         }
         setShowModal(true);
+    };
+
+    // MODIFIKASI: Fungsi membuka detail item
+    const openDetailModal = (item) => {
+        setSelectedItem(item);
+        setShowDetailModal(true);
     };
 
     const handleSubmit = async (e) => {
@@ -75,7 +85,8 @@ const ManageItems = () => {
         });
     };
 
-    const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+    const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
+    const formatFullDateTime = (dateStr) => dateStr ? new Date(dateStr).toLocaleString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
 
     if (userRole !== 'admin' && userRole !== 'superadmin') return <div>Akses Ditolak</div>;
 
@@ -93,52 +104,78 @@ const ManageItems = () => {
                 <table className="mi-table">
                     <thead>
                         <tr>
-                            <th>No</th>
-                            <th>Nama Item / Layanan</th>
-                            <th>Harga Default</th>
-                            <th style={{ textAlign: 'right' }}>Aksi</th>
+                            <th width="10%">No</th>
+                            <th width="50%">Nama Item / Layanan</th>
+                            <th width="25%">Harga Default</th>
+                            <th width="15%" style={{ textAlign: 'right' }}>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {items.map((item, index) => (
-                            <tr key={item.id_item_layanan}>
-                                <td>{index + 1}</td>
-                                <td className="mi-text-main">{item.nama_item}</td>
-                                <td>{formatRupiah(item.harga)}</td>
-                                <td className="mi-action-cell">
-                                    <button className="mi-btn-icon" onClick={() => handleOpenModal(item)}>Edit</button>
-                                    <button className="mi-btn-icon mi-btn-danger" onClick={() => handleDelete(item.id_item_layanan)}>Hapus</button>
-                                </td>
-                            </tr>
-                        ))}
+                        {items.length > 0 ? (
+                            items.map((item, index) => (
+                                <tr key={item.id_item_layanan}>
+                                    <td className="mi-text-muted">{index + 1}</td>
+                                    <td className="mi-text-main">{item.nama_item}</td>
+                                    <td>{formatRupiah(item.harga)}</td>
+                                    <td className="mi-action-cell">
+                                        {/* MODIFIKASI: Tombol Detail (Mata) */}
+                                        <button className="mi-btn-icon" onClick={() => openDetailModal(item)} title="Lihat Detail">
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                        </button>
+                                        <button className="mi-btn-icon" onClick={() => handleOpenModal(item)} title="Edit">
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </button>
+                                        <button className="mi-btn-icon mi-btn-danger" onClick={() => handleDelete(item.id_item_layanan)} title="Hapus">
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr><td colSpan="4" className="mi-text-center">Katalog master item masih kosong.</td></tr>
+                        )}
                     </tbody>
                 </table>
             </div>
 
-            {showModal && (
+            {/* MODIFIKASI: Modal Detail Item */}
+            {showDetailModal && selectedItem && (
                 <div className="mi-modal-overlay">
-                    <div className="mi-modal-box">
+                    <div className="mi-modal-box" style={{ maxWidth: '440px' }}>
                         <div className="mi-modal-header">
-                            <h3>{isEdit ? 'Edit Item' : 'Tambah Item Baru'}</h3>
-                            <button className="mi-btn-close" onClick={() => setShowModal(false)}>&times;</button>
+                            <h3>Rincian Item Katalog</h3>
+                            <button className="mi-btn-close" onClick={() => setShowDetailModal(false)}>&times;</button>
                         </div>
-                        <form onSubmit={handleSubmit} className="mi-form">
-                            <div className="mi-form-group">
-                                <label>Nama Item Layanan</label>
-                                <input type="text" value={formData.nama_item} onChange={(e) => setFormData({...formData, nama_item: e.target.value})} required />
+                        <div style={{ padding: '24px' }}>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>ID LAYANAN</label>
+                                <span style={{ fontSize: '14px', color: '#0f172a', fontWeight: '500' }}>#{selectedItem.id_item_layanan}</span>
                             </div>
-                            <div className="mi-form-group">
-                                <label>Harga Default (Rp)</label>
-                                <input type="number" value={formData.harga} onChange={(e) => setFormData({...formData, harga: e.target.value})} required />
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>NAMA LAYANAN / ITEM</label>
+                                <span style={{ fontSize: '15px', color: '#0f172a', fontWeight: '600' }}>{selectedItem.nama_item}</span>
                             </div>
-                            <div className="mi-modal-actions">
-                                <button type="button" className="mi-btn-outline" onClick={() => setShowModal(false)}>Batal</button>
-                                <button type="submit" className="mi-btn-primary">Simpan</button>
+                            <div style={{ marginBottom: '16px' }}>
+                                <label style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', display: 'block', marginBottom: '4px' }}>HARGA ACUAN DEFAULT</label>
+                                <span style={{ fontSize: '16px', color: '#2563eb', fontWeight: '700' }}>{formatRupiah(selectedItem.harga)}</span>
                             </div>
-                        </form>
+                            <div style={{ marginBottom: '16px', borderTop: '1px solid #e2e8f0', paddingTop: '12px' }}>
+                                <label style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '600', display: 'block', marginBottom: '2px' }}>DIBUAT PADA</label>
+                                <span style={{ fontSize: '13px', color: '#475569' }}>{formatFullDateTime(selectedItem.created_at || selectedItem.createdAt)}</span>
+                            </div>
+                            <div>
+                                <label style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '600', display: 'block', marginBottom: '2px' }}>PERUBAHAN TERAKHIR</label>
+                                <span style={{ fontSize: '13px', color: '#475569' }}>{formatFullDateTime(selectedItem.updated_at || selectedItem.updatedAt)}</span>
+                            </div>
+                            <div className="mi-modal-actions" style={{ marginTop: '24px' }}>
+                                <button type="button" className="mi-btn-primary" onClick={() => setShowDetailModal(false)}>Tutup</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
+
+            {/* Modal Tambah/Edit Form ... */}
         </div>
     );
 };

@@ -11,13 +11,19 @@ const ManageInvoices = () => {
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     
+    // State Modal Status
     const [showStatusModal, setShowStatusModal] = useState(false);
     const [currentInvoiceId, setCurrentInvoiceId] = useState(null);
     const [statusData, setStatusData] = useState('Belum Dibayar');
 
+    // State Modal Buat Invoice
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [formData, setFormData] = useState({ id_user_admin: '', tanggal: '' });
     const [items, setItems] = useState([{ tipe: '', deskripsi: '', qty: 1, harga: 0, isCustom: false }]);
+
+    // State Modal Detail
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
 
     const itemsPerPage = 15;
     const userRole = localStorage.getItem('role'); 
@@ -41,7 +47,9 @@ const ManageInvoices = () => {
             });
             setInvoices(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
-            console.error("Gagal memuat data invoice:", error);
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                Swal.fire('Sesi Habis', 'Silakan login kembali', 'error');
+            }
         }
     };
 
@@ -70,7 +78,7 @@ const ManageInvoices = () => {
                 { label: "Lainnya (Custom)", price: 0, isCustom: true }
             ]);
         } catch (error) {
-            console.error("Gagal memuat katalog item", error);
+            console.error("Gagal memuat katalog item");
         }
     };
 
@@ -85,6 +93,11 @@ const ManageInvoices = () => {
     );
     const currentInvoices = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+
+    const openDetailModal = (invoice) => {
+        setSelectedInvoice(invoice);
+        setShowDetailModal(true);
+    };
 
     const openEditStatusModal = (invoice) => {
         setCurrentInvoiceId(invoice.id_invoice); 
@@ -235,12 +248,15 @@ const ManageInvoices = () => {
                                     <td className="mi-text-main">{formatRupiah(inv.total)}</td>
                                     <td><span className={`mi-badge ${getStatusBadgeClass(inv.status)}`}>{inv.status || 'Belum Dibayar'}</span></td>
                                     <td className="mi-action-cell">
+                                        <button className="mi-btn-icon" onClick={() => openDetailModal(inv)} title="Lihat Detail">
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                        </button>
                                         <button className="mi-btn-icon" onClick={() => openEditStatusModal(inv)} title="Update Status">
-                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                         </button>
                                         {userRole === 'superadmin' && (
                                             <button className="mi-btn-icon mi-btn-danger" onClick={() => handleDelete(inv.id_invoice)} title="Hapus Invoice">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                             </button>
                                         )}
                                     </td>
@@ -258,7 +274,76 @@ const ManageInvoices = () => {
                     <button className="mi-page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}>Selanjutnya</button>
                 </div>
             )}
-            
+
+            {/* =========================================
+                MODAL LIHAT DETAIL INVOICE
+            ========================================= */}
+            {showDetailModal && selectedInvoice && (
+                <div className="mi-modal-overlay">
+                    <div className="mi-modal-box" style={{ maxWidth: '700px' }}>
+                        <div className="mi-modal-header">
+                            <h3>Rincian Lengkap Invoice</h3>
+                            <button className="mi-btn-close" onClick={() => setShowDetailModal(false)}>&times;</button>
+                        </div>
+                        <div style={{ padding: '24px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px', backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px' }}>
+                                <div>
+                                    <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#64748b', fontWeight: '600' }}>NOMOR INVOICE</p>
+                                    <p style={{ margin: 0, fontWeight: '600', color: '#0f172a' }}>{selectedInvoice.nomor_invoice}</p>
+                                </div>
+                                <div>
+                                    <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#64748b', fontWeight: '600' }}>STATUS</p>
+                                    <span className={`mi-badge ${getStatusBadgeClass(selectedInvoice.status)}`}>{selectedInvoice.status || 'Belum Dibayar'}</span>
+                                </div>
+                                <div>
+                                    <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#64748b', fontWeight: '600' }}>NAMA PENGGUNA</p>
+                                    <p style={{ margin: 0, color: '#334155' }}>{selectedInvoice.User?.nama || '-'}</p>
+                                </div>
+                                <div>
+                                    <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#64748b', fontWeight: '600' }}>TANGGAL TERBIT</p>
+                                    <p style={{ margin: 0, color: '#334155' }}>{formatDate(selectedInvoice.tanggal_invoice || selectedInvoice.created_at)}</p>
+                                </div>
+                            </div>
+
+                            <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: '#0f172a' }}>Daftar Item Tagihan</h4>
+                            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+                                <table width="100%" style={{ borderCollapse: 'collapse', fontSize: '14px' }}>
+                                    <thead>
+                                        <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', textAlign: 'left' }}>
+                                            <th style={{ padding: '12px', color: '#64748b' }}>Deskripsi Layanan</th>
+                                            <th style={{ padding: '12px', textAlign: 'center', color: '#64748b' }}>Qty</th>
+                                            <th style={{ padding: '12px', textAlign: 'right', color: '#64748b' }}>Harga Satuan</th>
+                                            <th style={{ padding: '12px', textAlign: 'right', color: '#64748b' }}>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {selectedInvoice.items && selectedInvoice.items.length > 0 ? (
+                                            selectedInvoice.items.map((item, idx) => (
+                                                <tr key={idx} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                                                    <td style={{ padding: '12px', color: '#0f172a' }}>{item.deskripsi}</td>
+                                                    <td style={{ padding: '12px', textAlign: 'center', color: '#334155' }}>{item.qty}</td>
+                                                    <td style={{ padding: '12px', textAlign: 'right', color: '#334155' }}>{formatRupiah(item.harga)}</td>
+                                                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: '500', color: '#0f172a' }}>{formatRupiah(item.subtotal)}</td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr><td colSpan="4" style={{ padding: '12px', textAlign: 'center', color: '#94a3b8' }}>Tidak ada rincian item.</td></tr>
+                                        )}
+                                        <tr style={{ backgroundColor: '#f8fafc', fontWeight: '700' }}>
+                                            <td colSpan="3" style={{ padding: '12px', textAlign: 'right', color: '#0f172a' }}>TOTAL AKHIR:</td>
+                                            <td style={{ padding: '12px', textAlign: 'right', color: '#2563eb' }}>{formatRupiah(selectedInvoice.total)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* =========================================
+                MODAL TAMBAH INVOICE
+            ========================================= */}
             {showCreateModal && (
                 <div className="mi-modal-overlay">
                     <div className="mi-modal-box" style={{ maxWidth: '600px' }}>
@@ -308,6 +393,9 @@ const ManageInvoices = () => {
                 </div>
             )}
 
+            {/* =========================================
+                MODAL UPDATE STATUS INVOICE
+            ========================================= */}
             {showStatusModal && (
                 <div className="mi-modal-overlay">
                     <div className="mi-modal-box">
