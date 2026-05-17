@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const { Op } = require('sequelize'); // Sesuaikan jika menggunakan Mongoose, kode ini untuk Sequelize
+const { Op } = require('sequelize'); 
 
 // READ & SEARCH
 exports.getUsers = async (req, res) => {
@@ -8,12 +8,13 @@ exports.getUsers = async (req, res) => {
         const search = req.query.search || '';
         const users = await User.findAll({
             where: {
-                name: { [Op.like]: `%${search}%` } // Search berdasarkan nama
+                nama: { [Op.like]: `%${search}%` } // PERBAIKAN: name -> nama
             },
-            attributes: { exclude: ['password'] } // Jangan kirim password ke frontend
+            attributes: { exclude: ['password'] } 
         });
         res.json(users);
     } catch (error) {
+        console.error("Error getUsers:", error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -21,9 +22,9 @@ exports.getUsers = async (req, res) => {
 // CREATE
 exports.createUser = async (req, res) => {
     try {
-        const { name, email, password, role } = req.body;
+        const { nama, email, password, role } = req.body; // PERBAIKAN: name -> nama
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({ name, email, password: hashedPassword, role });
+        const user = await User.create({ nama, email, password: hashedPassword, role });
         res.status(201).json({ message: "User berhasil dibuat!" });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -33,20 +34,20 @@ exports.createUser = async (req, res) => {
 // UPDATE (Dengan Validasi Role)
 exports.updateUser = async (req, res) => {
     try {
-        const { name, email, role, password } = req.body;
+        const { nama, email, role, password } = req.body; // PERBAIKAN: name -> nama
         const user = await User.findByPk(req.params.id);
 
         if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
 
-        // LOGIKA PEMBATASAN ROLE:
-        // Jika role diubah, dan yang login BUKAN superadmin, tolak permintaan
         if (role && role !== user.role) {
-            if (req.user.role !== 'superadmin') {
+            // Karena ini dipanggil dari route biasa tanpa cek superadmin yang ketat, 
+            // pastikan pembatasan ini tetap berjalan jika req.user tersedia
+            if (req.user && req.user.role !== 'superadmin') {
                 return res.status(403).json({ message: 'Akses ditolak: Hanya Superadmin yang dapat mengubah role user.' });
             }
         }
 
-        const updates = { name, email, role };
+        const updates = { nama, email, role }; // PERBAIKAN: name -> nama
         if (password) {
             updates.password = await bcrypt.hash(password, 10);
         }

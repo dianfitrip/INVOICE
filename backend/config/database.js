@@ -10,6 +10,7 @@ const db = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'mysql',
+        logging: false, // Menghilangkan log SQL bawaan Sequelize
         pool: {
             max: 5,
             min: 0,
@@ -21,10 +22,10 @@ const db = new Sequelize(
 
 db.authenticate()
     .then(() => {
-        console.log('✅ Berhasil terhubung ke Database MySQL.');
+        console.log('Berhasil terhubung ke Database MySQL.');
     })
     .catch(err => {
-        console.error('❌ Gagal terhubung ke Database:', err);
+        console.error('Gagal terhubung ke Database:', err);
     });
 
 module.exports = db;

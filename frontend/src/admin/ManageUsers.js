@@ -11,8 +11,9 @@ const ManageUsers = () => {
     const [isEdit, setIsEdit] = useState(false);
     const [currentUserId, setCurrentUserId] = useState(null);
     
+    // PERBAIKAN: State 'name' diubah jadi 'nama'
     const [formData, setFormData] = useState({
-        name: '',
+        nama: '', 
         email: '',
         password: '',
         role: 'user'
@@ -20,7 +21,7 @@ const ManageUsers = () => {
 
     const itemsPerPage = 15;
     const userRole = localStorage.getItem('role'); 
-    const API_URL = 'http://localhost:5000/api/users'; // URL Backend API Anda
+    const API_URL = 'http://localhost:5000/api/users'; 
 
     useEffect(() => {
         if (userRole === 'superadmin') {
@@ -28,14 +29,14 @@ const ManageUsers = () => {
         }
     }, [search, userRole]);
 
-    // READ & SEARCH: Mengambil data dari database
     const fetchUsersData = async () => {
         try {
-            const token = localStorage.getItem('accessToken'); // Menggunakan accessToken sesuai LoginPage
+            const token = localStorage.getItem('accessToken'); 
             const response = await axios.get(`${API_URL}?search=${search}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setUsers(response.data);
+            // Memastikan data yang disimpan adalah array, jika gagal akan menjadi array kosong
+            setUsers(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error("Gagal memuat data pengguna:", error);
             if (error.response?.status === 401 || error.response?.status === 403) {
@@ -44,7 +45,6 @@ const ManageUsers = () => {
         }
     };
 
-    // Proteksi UI halaman jika pengguna bukan superadmin
     if (userRole !== 'superadmin') {
         return (
             <div style={{ padding: '20px', textAlign: 'center', color: 'red', fontWeight: 'bold' }}>
@@ -53,7 +53,6 @@ const ManageUsers = () => {
         ); 
     }
 
-    // Logika Pagination (Maksimal 15 data per halaman)
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
@@ -66,15 +65,15 @@ const ManageUsers = () => {
 
     const openCreateModal = () => {
         setIsEdit(false);
-        setFormData({ name: '', email: '', password: '', role: 'user' });
+        setFormData({ nama: '', email: '', password: '', role: 'user' }); // PERBAIKAN: nama
         setShowModal(true);
     };
 
     const openEditModal = (user) => {
         setIsEdit(true);
         setCurrentUserId(user.id);
-        // Password dikosongkan saat edit agar tidak wajib diisi jika tidak ingin diubah
-        setFormData({ name: user.name, email: user.email, password: '', role: user.role });
+        // PERBAIKAN: user.nama
+        setFormData({ nama: user.nama, email: user.email, password: '', role: user.role });
         setShowModal(true);
     };
 
@@ -82,33 +81,29 @@ const ManageUsers = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // CREATE & UPDATE
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('accessToken');
         
         try {
             if (isEdit) {
-                // UPDATE: Mengirim data ke backend berdasarkan ID
                 const response = await axios.put(`${API_URL}/${currentUserId}`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 Swal.fire('Berhasil!', response.data.message, 'success');
             } else {
-                // CREATE: Mengirim data user baru ke backend
                 const response = await axios.post(API_URL, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 Swal.fire('Berhasil!', response.data.message, 'success');
             }
             setShowModal(false);
-            fetchUsersData(); // Muat ulang data setelah perubahan sukses
+            fetchUsersData(); 
         } catch (error) {
             Swal.fire('Gagal!', error.response?.data?.message || "Terjadi kesalahan sistem", 'error');
         }
     };
 
-    // DELETE
     const handleDelete = async (id) => {
         Swal.fire({
             title: 'Apakah Anda yakin?',
@@ -127,7 +122,7 @@ const ManageUsers = () => {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     Swal.fire('Terhapus!', response.data.message, 'success');
-                    fetchUsersData(); // Muat ulang data setelah sukses menghapus
+                    fetchUsersData(); 
                 } catch (error) {
                     Swal.fire('Gagal!', error.response?.data?.message || "Gagal menghapus pengguna", 'error');
                 }
@@ -168,7 +163,7 @@ const ManageUsers = () => {
                             currentUsers.map((user, index) => (
                                 <tr key={user.id}>
                                     <td>{indexOfFirstItem + index + 1}</td>
-                                    <td>{user.name}</td>
+                                    <td>{user.nama}</td> {/* PERBAIKAN: user.nama */}
                                     <td>{user.email}</td>
                                     <td><span className={`badge-role ${user.role}`}>{user.role}</span></td>
                                     <td>
@@ -217,8 +212,8 @@ const ManageUsers = () => {
                                 <label>Nama</label>
                                 <input 
                                     type="text" 
-                                    name="name" 
-                                    value={formData.name} 
+                                    name="nama" // PERBAIKAN: name atribut jadi 'nama'
+                                    value={formData.nama} 
                                     onChange={handleInputChange} 
                                     required 
                                 />
