@@ -1,27 +1,33 @@
-const db = require('../config/database');
+const User = require('./User');
 const Invoice = require('./Invoice');
 const InvoiceItem = require('./InvoiceItem');
-const User = require('./User');
-const Payment = require('./Payment');
 const Kwitansi = require('./Kwitansi');
+const Payment = require('./Payment');
 
-User.hasMany(Invoice, { foreignKey: 'id_user' });
+// PENAMBAHAN: Import model ServiceItem
+const ServiceItem = require('./ServiceItem'); 
+
+// Relasi Invoice -> User
 Invoice.belongsTo(User, { foreignKey: 'id_user' });
+User.hasMany(Invoice, { foreignKey: 'id_user' });
 
-Invoice.hasMany(InvoiceItem, { foreignKey: 'id_invoice', as: 'items' });
+// Relasi InvoiceItem -> Invoice
 InvoiceItem.belongsTo(Invoice, { foreignKey: 'id_invoice' });
+Invoice.hasMany(InvoiceItem, { foreignKey: 'id_invoice', as: 'items' });
 
-Invoice.hasMany(Payment, { foreignKey: 'id_invoice' });
-Payment.belongsTo(Invoice, { foreignKey: 'id_invoice' });
-
-Invoice.hasOne(Kwitansi, { foreignKey: 'id_invoice' });
+// Relasi Kwitansi -> Invoice
 Kwitansi.belongsTo(Invoice, { foreignKey: 'id_invoice' });
+Invoice.hasOne(Kwitansi, { foreignKey: 'id_invoice' });
+
+// Relasi Payment -> Invoice
+Payment.belongsTo(Invoice, { foreignKey: 'id_invoice' });
+Invoice.hasMany(Payment, { foreignKey: 'id_invoice' });
 
 module.exports = {
-    db,
     User,
     Invoice,
     InvoiceItem,
+    Kwitansi,
     Payment,
-    Kwitansi
+    ServiceItem // PENAMBAHAN: Ekspor ServiceItem agar bisa diakses oleh Controller
 };
