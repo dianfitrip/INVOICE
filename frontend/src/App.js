@@ -12,7 +12,7 @@ import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
 import ManageUsers from './admin/ManageUsers';
 import ManageInvoices from './admin/ManageInvoices';
-import ManageItems from './admin/ManageItems'; // Pastikan file ManageItems.js sudah Anda buat
+import ManageItems from './admin/ManageItems'; 
 import './App.css';
 
 function App() {
@@ -54,7 +54,7 @@ function App() {
             </ProtectedRoute>
         } />
 
-        {/* Rute Kelola Item Layanan (Admin & Superadmin) */}
+        {/* Rute Kelola Katalog Item Layanan (Admin & Superadmin) */}
         <Route path="/admin/items" element={
             <ProtectedRoute allowedRoles={['admin', 'superadmin']}>
                 <AdminLayout>
@@ -63,7 +63,7 @@ function App() {
             </ProtectedRoute>
         } />
 
-        {/* Rute Fallback (Jika URL tidak ditemukan) */}
+        {/* Rute Fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

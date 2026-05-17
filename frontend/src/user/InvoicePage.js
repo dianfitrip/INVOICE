@@ -7,7 +7,7 @@ import './userstyles/InvoicePage.css';
 const InvoicePage = () => {
     const navigate = useNavigate();
     const [invoices, setInvoices] = useState([]);
-    const [predefinedItems, setPredefinedItems] = useState([]); // State dinamis item
+    const [predefinedItems, setPredefinedItems] = useState([]); 
     const [showModal, setShowModal] = useState(false);
     
     const [tanggal, setTanggal] = useState('');
@@ -59,7 +59,7 @@ const InvoicePage = () => {
                 ]);
             }
         } catch (error) {
-            console.error("Gagal load katalog", error);
+            console.error("Gagal memuat katalog", error);
         }
     };
 
@@ -97,7 +97,6 @@ const InvoicePage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const isInvalidItem = items.some(item => !item.deskripsi || item.harga <= 0 || item.qty <= 0);
         if (isInvalidItem) {
             return Swal.fire({
@@ -114,9 +113,7 @@ const InvoicePage = () => {
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#0f172a',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: 'Ya, Simpan',
-            cancelButtonText: 'Batal'
+            confirmButtonText: 'Ya, Simpan'
         });
 
         if (!result.isConfirmed) return;
@@ -156,7 +153,6 @@ const InvoicePage = () => {
     return (
         <div className="invoice-page-bg">
             <Navbar />
-            
             <div className="main-content-container">
                 <div className="page-header">
                     <h2>Daftar Invoice</h2>
@@ -189,20 +185,13 @@ const InvoicePage = () => {
                                             </span>
                                         </td>
                                         <td>
-                                            <button 
-                                                className="btn-small-outline"
-                                                onClick={() => navigate(`/invoice/${inv.id_invoice}`)}
-                                            >
-                                                Detail
-                                            </button>
+                                            <button className="btn-small-outline" onClick={() => navigate(`/invoice/${inv.id_invoice}`)}>Detail</button>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="5" className="empty-data-row">
-                                        Belum ada invoice. Silakan buat baru.
-                                    </td>
+                                    <td colSpan="5" className="empty-data-row">Belum ada invoice. Silakan buat baru.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -220,13 +209,7 @@ const InvoicePage = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="form-group">
                                 <label>Tanggal Invoice</label>
-                                <input 
-                                    type="date" 
-                                    className="form-input" 
-                                    value={tanggal}
-                                    onChange={(e) => setTanggal(e.target.value)}
-                                    required 
-                                />
+                                <input type="date" className="form-input" value={tanggal} onChange={(e) => setTanggal(e.target.value)} required />
                             </div>
 
                             <div className="items-section">
@@ -234,61 +217,28 @@ const InvoicePage = () => {
                                 {items.map((item, index) => (
                                     <div key={index} style={{ marginBottom: '16px', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
                                         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                                            <select 
-                                                className="form-input" 
-                                                style={{ flex: 1 }}
-                                                value={item.tipe}
-                                                onChange={(e) => handleItemSelectChange(index, e.target.value)}
-                                                required
-                                            >
-                                                {/* PENGGUNAAN STATE DINAMIS */}
+                                            <select className="form-input" style={{ flex: 1 }} value={item.tipe} onChange={(e) => handleItemSelectChange(index, e.target.value)} required>
                                                 {predefinedItems.map((opts, i) => (
                                                     <option key={i} value={opts.label}>{opts.label}</option>
                                                 ))}
                                             </select>
                                             {items.length > 1 && (
-                                                <button type="button" className="btn-remove" onClick={() => handleRemoveItem(index)} title="Hapus Item">×</button>
+                                                <button type="button" className="btn-remove" onClick={() => handleRemoveItem(index)}>×</button>
                                             )}
                                         </div>
 
                                         {item.isCustom && (
-                                            <input 
-                                                type="text" 
-                                                className="form-input" 
-                                                style={{ marginBottom: '8px', width: '100%', boxSizing: 'border-box' }}
-                                                placeholder="Deskripsi Item Custom"
-                                                value={item.deskripsi}
-                                                onChange={(e) => handleItemTextChange(index, 'deskripsi', e.target.value)}
-                                                required
-                                            />
+                                            <input type="text" className="form-input" style={{ marginBottom: '8px', width: '100%', boxSizing: 'border-box' }} placeholder="Deskripsi Item Custom" value={item.deskripsi} onChange={(e) => handleItemTextChange(index, 'deskripsi', e.target.value)} required />
                                         )}
 
                                         <div style={{ display: 'flex', gap: '8px' }}>
-                                            <input 
-                                                type="number" 
-                                                className="form-input input-qty" 
-                                                placeholder="Qty"
-                                                min="1"
-                                                value={item.qty}
-                                                onChange={(e) => handleItemTextChange(index, 'qty', e.target.value)}
-                                                required
-                                            />
-                                            <input 
-                                                type="number" 
-                                                className="form-input input-price" 
-                                                placeholder="Harga"
-                                                min="0"
-                                                value={item.harga}
-                                                onChange={(e) => handleItemTextChange(index, 'harga', e.target.value)}
-                                                disabled={!item.isCustom} 
-                                                required
-                                            />
+                                            <input type="number" className="form-input input-qty" placeholder="Qty" min="1" value={item.qty} onChange={(e) => handleItemTextChange(index, 'qty', e.target.value)} required />
+                                            <input type="number" className="form-input input-price" placeholder="Harga" min="0" value={item.harga} onChange={(e) => handleItemTextChange(index, 'harga', e.target.value)} disabled={!item.isCustom} required />
                                         </div>
                                     </div>
                                 ))}
-                                <button type="button" className="btn-add-item" onClick={handleAddItem} style={{ marginTop: '8px' }}>+ Tambah Item</button>
+                                <button type="button" className="btn-add-item" onClick={handleAddItem}>+ Tambah Item</button>
                             </div>
-
                             <button type="submit" className="btn-submit-modal" style={{ marginTop: '20px', width: '100%' }}>Simpan Invoice</button>
                         </form>
                     </div>

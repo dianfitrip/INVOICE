@@ -1,10 +1,9 @@
 const { Invoice, InvoiceItem, Kwitansi, User } = require('../models');
 
+// CREATE INVOICE
 exports.createInvoice = async (req, res) => {
     try {
         const { tanggal_invoice, items, id_user_admin } = req.body;
-        
-        // Jika yang membuat admin, gunakan id_user_admin dari request body. Jika user, gunakan req.userId dari token.
         const id_user = id_user_admin || req.userId; 
 
         if (!id_user) return res.status(400).json({ msg: "User ID tidak ditemukan" });
@@ -35,7 +34,6 @@ exports.createInvoice = async (req, res) => {
         }));
 
         await InvoiceItem.bulkCreate(invoiceItems);
-
         res.status(201).json({ msg: "Invoice Berhasil Dibuat", data: newInvoice });
 
     } catch (error) {
@@ -44,6 +42,7 @@ exports.createInvoice = async (req, res) => {
     }
 };
 
+// READ: MY INVOICES (UNTUK SISI USER KLIEN)
 exports.getMyInvoices = async (req, res) => {
     try {
         const invoices = await Invoice.findAll({
@@ -58,32 +57,13 @@ exports.getMyInvoices = async (req, res) => {
     }
 };
 
-exports.getInvoiceById = async (req, res) => {
-    try {
-        const invoice = await Invoice.findOne({
-            where: { 
-                id_invoice: req.params.id,
-                id_user: req.userId 
-            },
-            include: [{ model: InvoiceItem, as: 'items' }]
-        });
-
-        if(!invoice) return res.status(404).json({msg: "Invoice tidak ditemukan"});
-        
-        res.json(invoice);
-    } catch (error) {
-        console.error("Error getInvoiceById:", error);
-        res.status(500).json({ msg: "Server Error" });
-    }
-};
-
-// MENAMPILKAN SEMUA INVOICE (UNTUK ADMIN)
+// READ: ALL INVOICES (UNTUK SISI ADMIN / SUPERADMIN)
 exports.getAllInvoices = async (req, res) => {
     try {
         const invoices = await Invoice.findAll({
             include: [
                 { model: InvoiceItem, as: 'items' },
-                { model: User, as: 'User', attributes: ['nama', 'email'] } // Opsional jika relasi User sudah di-set di models/index.js
+                { model: User, attributes: ['nama', 'email'] } // Perbaikan: Menghilangkan alias 'as' jika memicu bentrokan relasi
             ],
             order: [['created_at', 'DESC']]
         });
@@ -94,7 +74,7 @@ exports.getAllInvoices = async (req, res) => {
     }
 };
 
-// UPDATE STATUS & AUTO-GENERATE KWITANSI
+// UPDATE STATUS INVOICE & AUTO KWITANSI
 exports.updateInvoiceStatus = async (req, res) => {
     try {
         const { status } = req.body;
@@ -104,7 +84,6 @@ exports.updateInvoiceStatus = async (req, res) => {
 
         await invoice.update({ status });
 
-        // Generate Kwitansi otomatis jika status menjadi Lunas
         if (status === 'Lunas') {
             const existingKwitansi = await Kwitansi.findOne({ where: { id_invoice: invoice.id_invoice } });
             
@@ -124,7 +103,7 @@ exports.updateInvoiceStatus = async (req, res) => {
         res.json({ message: "Status invoice berhasil diperbarui." });
     } catch (error) {
         console.error("Error updateInvoiceStatus:", error);
-        res.status(500).json({ msg: "Terjadi kesalahan saat memperbarui status." });
+        res.status(500).json({ msg: "Gagal memperbarui status." });
     }
 };
 
@@ -134,8 +113,6 @@ exports.deleteInvoice = async (req, res) => {
         const invoice = await Invoice.findByPk(req.params.id);
         if (!invoice) return res.status(404).json({ msg: "Invoice tidak ditemukan" });
 
-        // InvoiceItem dan Kwitansi terkait disarankan diatur CASCADE di database, 
-        // atau dihapus manual di sini jika tidak menggunakan CASCADE.
         await invoice.destroy();
         res.json({ message: "Invoice berhasil dihapus." });
     } catch (error) {

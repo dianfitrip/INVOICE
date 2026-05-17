@@ -6,7 +6,7 @@ import './adminstyles/ManageInvoices.css';
 const ManageInvoices = () => {
     const [invoices, setInvoices] = useState([]);
     const [usersList, setUsersList] = useState([]); 
-    const [predefinedItems, setPredefinedItems] = useState([]); // State untuk item dinamis
+    const [predefinedItems, setPredefinedItems] = useState([]); 
 
     const [search, setSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -29,21 +29,19 @@ const ManageInvoices = () => {
         if (userRole === 'admin' || userRole === 'superadmin') {
             fetchInvoicesData();
             fetchUsersList(); 
-            fetchCatalogItems(); // Tarik data item dari DB
+            fetchCatalogItems(); 
         }
     }, [search, userRole]);
 
     const fetchInvoicesData = async () => {
         try {
             const token = localStorage.getItem('accessToken'); 
-            const response = await axios.get(`${API_URL}?search=${search}`, {
+            const response = await axios.get(API_URL, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setInvoices(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
-            if (error.response?.status === 401 || error.response?.status === 403) {
-                Swal.fire('Sesi Habis', 'Silakan login kembali', 'error');
-            }
+            console.error("Gagal memuat data invoice:", error);
         }
     };
 
@@ -53,29 +51,26 @@ const ManageInvoices = () => {
             const response = await axios.get(USER_API_URL, { headers: { Authorization: `Bearer ${token}` }});
             setUsersList(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
-            console.error("Gagal memuat list user");
+            console.error("Gagal memuat daftar pengguna");
         }
     };
 
-    // FUNGSI UNTUK MENARIK DATA ITEM DINAMIS
     const fetchCatalogItems = async () => {
         try {
             const token = localStorage.getItem('accessToken');
             const res = await axios.get(ITEM_API_URL, { headers: { Authorization: `Bearer ${token}` }});
-            
-            const formattedItems = res.data.map(item => ({
+            const formatted = res.data.map(item => ({
                 label: item.nama_item,
                 price: item.harga,
                 isCustom: false
             }));
-
             setPredefinedItems([
                 { label: "Pilih Item...", price: 0, isCustom: false },
-                ...formattedItems,
+                ...formatted,
                 { label: "Lainnya (Custom)", price: 0, isCustom: true }
             ]);
         } catch (error) {
-            console.error("Gagal memuat item katalog", error);
+            console.error("Gagal memuat katalog item", error);
         }
     };
 
@@ -85,8 +80,11 @@ const ManageInvoices = () => {
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentInvoices = invoices.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(invoices.length / itemsPerPage);
+    const filteredInvoices = invoices.filter(inv => 
+        inv.nomor_invoice?.toLowerCase().includes(search.toLowerCase())
+    );
+    const currentInvoices = filteredInvoices.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
 
     const openEditStatusModal = (invoice) => {
         setCurrentInvoiceId(invoice.id_invoice); 
@@ -97,43 +95,40 @@ const ManageInvoices = () => {
     const handleStatusSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem('accessToken');
-        
         try {
             await axios.put(`${API_URL}/${currentInvoiceId}`, { status: statusData }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            Swal.fire('Berhasil!', "Status invoice diperbarui. Jika Lunas, Kwitansi telah diterbitkan otomatis.", 'success');
+            Swal.fire('Berhasil!', 'Status invoice diperbarui.', 'success');
             setShowStatusModal(false);
             fetchInvoicesData(); 
         } catch (error) {
-            Swal.fire('Gagal!', error.response?.data?.message || "Terjadi kesalahan", 'error');
+            Swal.fire('Gagal!', 'Gagal memperbarui status.', 'error');
         }
     };
 
     const handleDelete = async (id) => {
         Swal.fire({
             title: 'Hapus Invoice?',
-            text: "Invoice yang dihapus tidak dapat dikembalikan.",
+            text: "Data tidak dapat dikembalikan.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
             confirmButtonText: 'Ya, Hapus'
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const token = localStorage.getItem('accessToken');
                 try {
                     await axios.delete(`${API_URL}/${id}`, { headers: { Authorization: `Bearer ${token}` }});
-                    Swal.fire('Terhapus!', "Invoice berhasil dihapus", 'success');
+                    Swal.fire('Terhapus!', 'Invoice berhasil dihapus', 'success');
                     fetchInvoicesData(); 
                 } catch (error) {
-                    Swal.fire('Gagal!', "Gagal menghapus invoice", 'error');
+                    Swal.fire('Gagal!', 'Gagal menghapus.', 'error');
                 }
             }
         });
     };
 
-    // LOGIKA PEMILIHAN ITEM
     const handleItemSelectChange = (index, selectedLabel) => {
         const selectedObj = predefinedItems.find(item => item.label === selectedLabel);
         const newItems = [...items];
@@ -158,9 +153,9 @@ const ManageInvoices = () => {
 
     const handleCreateSubmit = async (e) => {
         e.preventDefault();
-        const isInvalidItem = items.some(item => !item.deskripsi || item.harga <= 0 || item.qty <= 0);
-        if (isInvalidItem || !formData.id_user_admin) {
-            return Swal.fire({ icon: 'warning', title: 'Data Tidak Lengkap', text: 'Pastikan User dan semua Item terisi dengan benar.'});
+        const isInvalid = items.some(item => !item.deskripsi || item.harga <= 0 || item.qty <= 0);
+        if (isInvalid || !formData.id_user_admin) {
+            return Swal.fire({ icon: 'warning', title: 'Data Tidak Lengkap', text: 'Periksa kembali formulir Anda.'});
         }
 
         const token = localStorage.getItem('accessToken');
@@ -264,7 +259,6 @@ const ManageInvoices = () => {
                 </div>
             )}
             
-            {/* Modal Tambah Invoice */}
             {showCreateModal && (
                 <div className="mi-modal-overlay">
                     <div className="mi-modal-box" style={{ maxWidth: '600px' }}>
@@ -291,7 +285,6 @@ const ManageInvoices = () => {
                                     <div key={index} style={{ padding: '12px', border: '1px solid #cbd5e1', borderRadius: '8px', marginBottom: '12px' }}>
                                         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                                             <select style={{ flex: 1 }} value={item.tipe} onChange={(e) => handleItemSelectChange(index, e.target.value)} required>
-                                                {/* PENGGUNAAN STATE DINAMIS */}
                                                 {predefinedItems.map((opts, i) => <option key={i} value={opts.label}>{opts.label}</option>)}
                                             </select>
                                             {items.length > 1 && <button type="button" onClick={() => setItems(items.filter((_, i) => i !== index))} style={{ padding: '8px', color: '#ef4444', border: 'none', background: 'none', cursor: 'pointer' }}>✖</button>}
@@ -315,7 +308,6 @@ const ManageInvoices = () => {
                 </div>
             )}
 
-            {/* Modal Update Status */}
             {showStatusModal && (
                 <div className="mi-modal-overlay">
                     <div className="mi-modal-box">
