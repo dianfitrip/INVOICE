@@ -5,24 +5,68 @@ import './adminstyles/ManageUsers.css';
 const ManageUsers = () => {
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState('');
-    const [formData, setFormData] = useState({ id: null, name: '', email: '', password: '', role: 'user' });
-    const [isEditing, setIsEditing] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [showModal, setShowModal] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
+    const [currentUserId, setCurrentUserId] = useState(null);
+    const [message, setMessage] = useState('');
     
-    // Ambil data user yang sedang login dari localStorage (Sesuaikan dengan cara app-mu menyimpan data auth)
-    const currentUser = JSON.parse(localStorage.getItem('user')); 
-    const isSuperAdmin = currentUser?.role === 'superadmin';
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'user'
+    });
+
+    const itemsPerPage = 15;
+    // Mengambil role pengguna dari localStorage untuk pembatasan akses UI
+    const userRole = localStorage.getItem('role'); 
 
     useEffect(() => {
-        fetchUsers();
-    }, [search]);
+        if (userRole === 'superadmin') {
+            fetchUsersData();
+        }
+    }, [search, userRole]);
 
-    const fetchUsers = async () => {
+    const fetchUsersData = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/users?search=${search}`);
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`/api/users?search=${search}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setUsers(response.data);
         } catch (error) {
-            console.error("Error fetching users", error);
+            console.error("Gagal memuat data pengguna:", error);
         }
+    };
+
+    // Proteksi halaman jika pengguna bukan superadmin
+    if (userRole !== 'superadmin') {
+        return null; 
+    }
+
+    // Logika Pagination (Maksimal 15 data per halaman)
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(users.length / itemsPerPage);
+
+    const handleSearchChange = (e) => {
+        setSearch(e.target.value);
+        setCurrentPage(1); // Reset ke halaman pertama saat melakukan pencarian
+    };
+
+    const openCreateModal = () => {
+        setIsEdit(false);
+        setFormData({ name: '', email: '', password: '', role: 'user' });
+        setShowModal(true);
+    };
+
+    const openEditModal = (user) => {
+        setIsEdit(true);
+        setCurrentUserId(user.id);
+        setFormData({ name: user.name, email: user.email, password: '', role: user.role });
+        setShowModal(true);
     };
 
     const handleInputChange = (e) => {
@@ -31,98 +75,169 @@ const ManageUsers = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const token = localStorage.getItem('token');
         try {
-            if (isEditing) {
-                await axios.put(`http://localhost:5000/api/users/${formData.id}`, formData);
-                alert("User berhasil diupdate");
+            if (isEdit) {
+                const response = await axios.put(`/api/users/${currentUserId}`, formData, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setMessage(response.data.message);
             } else {
-                await axios.post('http://localhost:5000/api/users', formData);
-                alert("User berhasil ditambahkan");
+                const response = await axios.post('/api/users', formData, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setMessage(response.data.message);
             }
-            setFormData({ id: null, name: '', email: '', password: '', role: 'user' });
-            setIsEditing(false);
-            fetchUsers();
+            setShowModal(false);
+            fetchUsersData();
+            setTimeout(() => setMessage(''), 3000);
         } catch (error) {
-            alert(error.response?.data?.message || "Terjadi kesalahan");
+            alert(error.response?.data?.message || "Terjadi kesalahan sistem");
         }
     };
 
-    const editUser = (user) => {
-        setFormData({ id: user.id, name: user.name, email: user.email, password: '', role: user.role });
-        setIsEditing(true);
-    };
-
-    const deleteUser = async (id) => {
-        if(window.confirm("Yakin ingin menghapus user ini?")) {
+    const handleDelete = async (id) => {
+        if (window.confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
+            const token = localStorage.getItem('token');
             try {
-                await axios.delete(`http://localhost:5000/api/users/${id}`);
-                fetchUsers();
+                const response = await axios.delete(`/api/users/${id}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setMessage(response.data.message);
+                fetchUsersData();
+                setTimeout(() => setMessage(''), 3000);
             } catch (error) {
-                console.error("Error deleting user", error);
+                alert(error.response?.data?.message || "Gagal menghapus pengguna");
             }
         }
     };
 
     return (
-        <div className="admin-content">
-            <h2>Kelola User</h2>
-            
-            {/* SEARCH */}
-            <input 
-                type="text" 
-                placeholder="Cari nama user..." 
-                value={search} 
-                onChange={(e) => setSearch(e.target.value)} 
-                style={{ marginBottom: '20px', padding: '8px', width: '300px' }}
-            />
+        <div className="manage-users-container">
+            <div className="manage-users-header">
+                <h2>Kelola User</h2>
+                <button className="btn-add-user" onClick={openCreateModal}>Tambah User Baru</button>
+            </div>
 
-            {/* FORM CREATE / UPDATE */}
-            <form onSubmit={handleSubmit} style={{ marginBottom: '30px', padding: '20px', border: '1px solid #ccc' }}>
-                <h3>{isEditing ? 'Edit User' : 'Tambah User'}</h3>
-                <input type="text" name="name" placeholder="Nama" value={formData.name} onChange={handleInputChange} required />
-                <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleInputChange} required />
-                <input type="password" name="password" placeholder={isEditing ? "Kosongkan jika tidak ubah password" : "Password"} value={formData.password} onChange={handleInputChange} required={!isEditing} />
-                
-                <select 
-                    name="role" 
-                    value={formData.role} 
-                    onChange={handleInputChange}
-                    disabled={isEditing && !isSuperAdmin} // Disable jika edit dan bukan superadmin
-                    title={isEditing && !isSuperAdmin ? "Hanya superadmin yang bisa ubah role" : ""}
-                >
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                    {isSuperAdmin && <option value="superadmin">Superadmin</option>}
-                </select>
+            {message && <div className="alert-success">{message}</div>}
 
-                <button type="submit">{isEditing ? 'Update' : 'Simpan'}</button>
-                {isEditing && <button type="button" onClick={() => { setIsEditing(false); setFormData({ id: null, name: '', email: '', password: '', role: 'user' }); }}>Batal</button>}
-            </form>
+            <div className="search-bar-container">
+                <input 
+                    type="text" 
+                    placeholder="Cari user berdasarkan nama..." 
+                    value={search} 
+                    onChange={handleSearchChange} 
+                    className="search-input"
+                />
+            </div>
 
-            {/* TABLE READ */}
-            <table border="1" cellPadding="10" style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                    <tr>
-                        <th>Nama</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map(user => (
-                        <tr key={user.id}>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.role}</td>
-                            <td>
-                                <button onClick={() => editUser(user)}>Edit</button>
-                                <button onClick={() => deleteUser(user.id)} style={{ backgroundColor: 'red', color: 'white' }}>Hapus</button>
-                            </td>
+            <div className="table-responsive">
+                <table className="users-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Aksi</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {currentUsers.length > 0 ? (
+                            currentUsers.map((user, index) => (
+                                <tr key={user.id}>
+                                    <td>{indexOfFirstItem + index + 1}</td>
+                                    <td>{user.name}</td>
+                                    <td>{user.email}</td>
+                                    <td><span className={`badge-role ${user.role}`}>{user.role}</span></td>
+                                    <td>
+                                        <button className="btn-action edit" onClick={() => openEditModal(user)}>Edit</button>
+                                        <button className="btn-action delete" onClick={() => handleDelete(user.id)}>Hapus</button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" className="text-center">Tidak ada data user ditemukan</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {totalPages > 1 && (
+                <div className="pagination-container">
+                    <button 
+                        className="btn-pagination" 
+                        disabled={currentPage === 1} 
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    >
+                        Sebelumnya
+                    </button>
+                    <span className="pagination-info">
+                        Halaman {currentPage} dari {totalPages}
+                    </span>
+                    <button 
+                        className="btn-pagination" 
+                        disabled={currentPage === totalPages} 
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    >
+                        Selanjutnya
+                    </button>
+                </div>
+            )}
+
+            {showModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>{isEdit ? 'Edit User' : 'Tambah User Baru'}</h3>
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label>Nama</label>
+                                <input 
+                                    type="text" 
+                                    name="name" 
+                                    value={formData.name} 
+                                    onChange={handleInputChange} 
+                                    required 
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Email</label>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    value={formData.email} 
+                                    onChange={handleInputChange} 
+                                    required 
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Password {isEdit && <span className="optional">(Kosongkan jika tidak diubah)</span>}</label>
+                                <input 
+                                    type="password" 
+                                    name="password" 
+                                    value={formData.password} 
+                                    onChange={handleInputChange} 
+                                    required={!isEdit} 
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Role</label>
+                                <select name="role" value={formData.role} onChange={handleInputChange}>
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="superadmin">Superadmin</option>
+                                </select>
+                            </div>
+                            <div className="modal-actions">
+                                <button type="button" className="btn-cancel" onClick={() => setShowModal(false)}>Batal</button>
+                                <button type="submit" className="btn-submit">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

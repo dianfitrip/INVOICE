@@ -1,209 +1,263 @@
-/* frontend/src/admin/adminstyles/ManageUsers.css */
-
 .manage-users-container {
-    padding: 20px 30px;
-    background-color: #f8f9fa; /* Warna background abu-abu sangat muda */
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 24px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
 }
 
-/* --- Bagian Header (Judul & Tombol Aksi Kanan) --- */
-.mu-header {
+.manage-users-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
-.mu-header h2 {
-    margin: 0;
+.manage-users-header h2 {
     font-size: 24px;
-    color: #333;
     font-weight: 600;
+    color: #1e293b;
+    margin: 0;
 }
 
-.mu-actions {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-.mu-search-input {
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 250px;
-    font-size: 14px;
-    outline: none;
-    transition: all 0.3s;
-}
-
-.mu-search-input:focus {
-    border-color: #F7941E;
-    box-shadow: 0 0 5px rgba(247, 148, 30, 0.3);
-}
-
-/* --- Gaya Tombol Utama --- */
-.mu-btn {
+.btn-add-user {
+    background-color: #2563eb;
+    color: #ffffff;
     padding: 10px 16px;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
     transition: background-color 0.2s;
 }
 
-.mu-btn-add {
-    background-color: #F7941E;
-    color: white;
+.btn-add-user:hover {
+    background-color: #1d4ed8;
 }
 
-.mu-btn-add:hover {
-    background-color: #e08316;
+.search-bar-container {
+    margin-bottom: 20px;
 }
 
-.mu-btn-outline {
-    background-color: white;
-    color: #555;
-    border: 1px solid #ddd;
-}
-
-.mu-btn-outline:hover {
-    background-color: #f1f1f1;
-}
-
-/* --- Container Form (Untuk Tambah/Edit) --- */
-.mu-form-card {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-    margin-bottom: 25px;
-    border: 1px solid #eaeaea;
-}
-
-.mu-form-card h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 18px;
-    color: #444;
-}
-
-.mu-form-group {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.mu-input {
-    flex: 1;
-    min-width: 180px;
-    padding: 10px;
-    border: 1px solid #ddd;
+.search-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
     border-radius: 6px;
     font-size: 14px;
-}
-
-.mu-input:focus {
-    border-color: #F7941E;
+    color: #334155;
     outline: none;
+    transition: border-color 0.2s;
 }
 
-/* --- Tabel Manajemen User --- */
-.mu-table-card {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-    border: 1px solid #eaeaea;
-    overflow: hidden; /* Menjaga sudut melengkung */
+.search-input:focus {
+    border-color: #3b82f6;
 }
 
-.mu-table {
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.users-table {
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-}
-
-.mu-table th {
-    background-color: #fbfbfb;
-    padding: 16px 20px;
-    font-weight: 600;
-    color: #666;
     font-size: 14px;
-    border-bottom: 1px solid #eaeaea;
 }
 
-.mu-table td {
-    padding: 16px 20px;
-    color: #444;
-    font-size: 14px;
-    border-bottom: 1px solid #eaeaea;
-    vertical-align: middle;
-}
-
-.mu-table tbody tr:hover {
-    background-color: #fdfdfd;
-}
-
-.mu-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-/* --- Badge Role --- */
-.mu-badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
+.users-table th {
+    background-color: #f8fafc;
+    color: #64748b;
     font-weight: 600;
+    padding: 12px 16px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.users-table td {
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+}
+
+.users-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.badge-role {
     display: inline-block;
-}
-
-.badge-superadmin {
-    background-color: #e8f5e9;
-    color: #2e7d32; /* Hijau */
-}
-
-.badge-admin {
-    background-color: #fff3e0;
-    color: #ef6c00; /* Oranye */
-}
-
-.badge-user {
-    background-color: #e3f2fd;
-    color: #1565c0; /* Biru */
-}
-
-/* --- Tombol Aksi di dalam Tabel --- */
-.mu-action-btn {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
+    padding: 4px 8px;
+    border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
+}
+
+.badge-role.superadmin {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+.badge-role.admin {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.badge-role.user {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.btn-action {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
     cursor: pointer;
+    font-weight: 500;
     margin-right: 8px;
-    transition: 0.2s;
 }
 
-.mu-btn-edit {
-    background-color: #f0f4ff;
-    color: #4361ee;
+.btn-action.edit {
+    background-color: #f59e0b;
+    color: #ffffff;
 }
 
-.mu-btn-edit:hover {
-    background-color: #dce4ff;
+.btn-action.delete {
+    background-color: #ef4444;
+    color: #ffffff;
 }
 
-.mu-btn-delete {
-    background-color: #ffeeee;
-    color: #d90429;
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
 }
 
-.mu-btn-delete:hover {
-    background-color: #ffd6d6;
+.btn-pagination {
+    padding: 8px 14px;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #334155;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-pagination:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* Modal Styling */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: #1e293b;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #334155;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #3b82f6;
+}
+
+.optional {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancel {
+    padding: 8px 16px;
+    background-color: #f1f5f9;
+    color: #475569;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-submit {
+    padding: 8px 16px;
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.alert-success {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 14px;
 }
