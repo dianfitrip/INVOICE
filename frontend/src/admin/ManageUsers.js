@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 import './adminstyles/ManageUsers.css';
 
 const ManageUsers = () => {
@@ -9,7 +10,6 @@ const ManageUsers = () => {
     const [showModal, setShowModal] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [currentUserId, setCurrentUserId] = useState(null);
-    const [message, setMessage] = useState('');
     
     const [formData, setFormData] = useState({
         name: '',
@@ -19,8 +19,8 @@ const ManageUsers = () => {
     });
 
     const itemsPerPage = 15;
-    // Mengambil role pengguna dari localStorage untuk pembatasan akses UI
     const userRole = localStorage.getItem('role'); 
+    const API_URL = 'http://localhost:5000/api/users'; // URL Backend API Anda
 
     useEffect(() => {
         if (userRole === 'superadmin') {
@@ -28,21 +28,29 @@ const ManageUsers = () => {
         }
     }, [search, userRole]);
 
+    // READ & SEARCH: Mengambil data dari database
     const fetchUsersData = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`/api/users?search=${search}`, {
+            const token = localStorage.getItem('accessToken'); // Menggunakan accessToken sesuai LoginPage
+            const response = await axios.get(`${API_URL}?search=${search}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUsers(response.data);
         } catch (error) {
             console.error("Gagal memuat data pengguna:", error);
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                Swal.fire('Sesi Habis', 'Silakan login kembali', 'error');
+            }
         }
     };
 
-    // Proteksi halaman jika pengguna bukan superadmin
+    // Proteksi UI halaman jika pengguna bukan superadmin
     if (userRole !== 'superadmin') {
-        return null; 
+        return (
+            <div style={{ padding: '20px', textAlign: 'center', color: 'red', fontWeight: 'bold' }}>
+                Akses Ditolak: Halaman ini hanya untuk Superadmin.
+            </div>
+        ); 
     }
 
     // Logika Pagination (Maksimal 15 data per halaman)
@@ -53,7 +61,7 @@ const ManageUsers = () => {
 
     const handleSearchChange = (e) => {
         setSearch(e.target.value);
-        setCurrentPage(1); // Reset ke halaman pertama saat melakukan pencarian
+        setCurrentPage(1); 
     };
 
     const openCreateModal = () => {
@@ -65,6 +73,7 @@ const ManageUsers = () => {
     const openEditModal = (user) => {
         setIsEdit(true);
         setCurrentUserId(user.id);
+        // Password dikosongkan saat edit agar tidak wajib diisi jika tidak ingin diubah
         setFormData({ name: user.name, email: user.email, password: '', role: user.role });
         setShowModal(true);
     };
@@ -73,43 +82,57 @@ const ManageUsers = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // CREATE & UPDATE
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
+        
         try {
             if (isEdit) {
-                const response = await axios.put(`/api/users/${currentUserId}`, formData, {
+                // UPDATE: Mengirim data ke backend berdasarkan ID
+                const response = await axios.put(`${API_URL}/${currentUserId}`, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setMessage(response.data.message);
+                Swal.fire('Berhasil!', response.data.message, 'success');
             } else {
-                const response = await axios.post('/api/users', formData, {
+                // CREATE: Mengirim data user baru ke backend
+                const response = await axios.post(API_URL, formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                setMessage(response.data.message);
+                Swal.fire('Berhasil!', response.data.message, 'success');
             }
             setShowModal(false);
-            fetchUsersData();
-            setTimeout(() => setMessage(''), 3000);
+            fetchUsersData(); // Muat ulang data setelah perubahan sukses
         } catch (error) {
-            alert(error.response?.data?.message || "Terjadi kesalahan sistem");
+            Swal.fire('Gagal!', error.response?.data?.message || "Terjadi kesalahan sistem", 'error');
         }
     };
 
+    // DELETE
     const handleDelete = async (id) => {
-        if (window.confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
-            const token = localStorage.getItem('token');
-            try {
-                const response = await axios.delete(`/api/users/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setMessage(response.data.message);
-                fetchUsersData();
-                setTimeout(() => setMessage(''), 3000);
-            } catch (error) {
-                alert(error.response?.data?.message || "Gagal menghapus pengguna");
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data user yang dihapus tidak bisa dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const token = localStorage.getItem('accessToken');
+                try {
+                    const response = await axios.delete(`${API_URL}/${id}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    Swal.fire('Terhapus!', response.data.message, 'success');
+                    fetchUsersData(); // Muat ulang data setelah sukses menghapus
+                } catch (error) {
+                    Swal.fire('Gagal!', error.response?.data?.message || "Gagal menghapus pengguna", 'error');
+                }
             }
-        }
+        });
     };
 
     return (
@@ -118,8 +141,6 @@ const ManageUsers = () => {
                 <h2>Kelola User</h2>
                 <button className="btn-add-user" onClick={openCreateModal}>Tambah User Baru</button>
             </div>
-
-            {message && <div className="alert-success">{message}</div>}
 
             <div className="search-bar-container">
                 <input 

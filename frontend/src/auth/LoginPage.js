@@ -70,6 +70,9 @@ const LoginPage = () => {
           // Paksa ke huruf kecil agar cocok dengan database ('admin' bukan 'Admin')
           const role = decoded?.role?.toLowerCase() || 'user'; 
 
+          // PENAMBAHAN KODE: Simpan role ke localStorage agar bisa dibaca oleh halaman admin
+          localStorage.setItem('role', role);
+
           Swal.fire({
             icon: 'success',
             title: 'Login Berhasil!',
