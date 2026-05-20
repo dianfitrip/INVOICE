@@ -11,7 +11,7 @@ const InvoicePage = () => {
     const [showModal, setShowModal] = useState(false);
     
     const [tanggal, setTanggal] = useState('');
-    const [catatan, setCatatan] = useState(''); // STATE CATATAN
+    const [catatan, setCatatan] = useState(''); 
     const [items, setItems] = useState([{ tipe: '', deskripsi: '', qty: 1, harga: 0, isCustom: false }]);
 
     useEffect(() => { fetchInvoices(); fetchCatalogItems(); }, []);
@@ -74,14 +74,14 @@ const InvoicePage = () => {
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({
                     tanggal_invoice: tanggal,
-                    catatan: catatan, // KIRIM CATATAN
+                    catatan: catatan, 
                     items: items.map(i => ({ deskripsi: i.deskripsi, qty: i.qty, harga: i.harga }))
                 })
             });
 
             if(response.ok) {
                 Swal.fire('Berhasil!', 'Invoice berhasil dibuat.', 'success');
-                setShowModal(false); fetchInvoices(); setTanggal(''); setCatatan(''); // RESET CATATAN
+                setShowModal(false); fetchInvoices(); setTanggal(''); setCatatan(''); 
                 setItems([{ tipe: '', deskripsi: '', qty: 1, harga: 0, isCustom: false }]);
             } else { Swal.fire('Gagal', 'Terjadi kesalahan.', 'error'); }
         } catch (error) { Swal.fire('Error', 'Gagal terhubung ke server', 'error'); }
@@ -118,7 +118,7 @@ const InvoicePage = () => {
 
             {showModal && (
                 <div className="modal-overlay">
-                    <div className="modal-content" style={{ maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
+                    <div className="modal-content invoice-modal-extended">
                         <div className="modal-header"><h3>Buat Invoice Baru</h3><button className="close-btn" onClick={() => setShowModal(false)}>&times;</button></div>
                         <form onSubmit={handleSubmit}>
                             <div className="form-group">
@@ -129,15 +129,15 @@ const InvoicePage = () => {
                             <div className="items-section">
                                 <label className="label-block">Item Tagihan</label>
                                 {items.map((item, index) => (
-                                    <div key={index} style={{ marginBottom: '16px', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
-                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                                            <select className="form-input" style={{ flex: 1 }} value={item.tipe} onChange={(e) => handleItemSelectChange(index, e.target.value)} required>
+                                    <div key={index} className="invoice-item-group">
+                                        <div className="invoice-item-controls">
+                                            <select className="form-input flex-1" value={item.tipe} onChange={(e) => handleItemSelectChange(index, e.target.value)} required>
                                                 {predefinedItems.map((opts, i) => <option key={i} value={opts.label}>{opts.label}</option>)}
                                             </select>
                                             {items.length > 1 && <button type="button" className="btn-remove" onClick={() => handleRemoveItem(index)}>×</button>}
                                         </div>
-                                        {item.isCustom && <input type="text" className="form-input" style={{ marginBottom: '8px', width: '100%', boxSizing: 'border-box' }} placeholder="Deskripsi Custom" value={item.deskripsi} onChange={(e) => handleItemTextChange(index, 'deskripsi', e.target.value)} required />}
-                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                        {item.isCustom && <input type="text" className="form-input w-full mb-8" placeholder="Deskripsi Custom" value={item.deskripsi} onChange={(e) => handleItemTextChange(index, 'deskripsi', e.target.value)} required />}
+                                        <div className="invoice-item-metrics">
                                             <input type="number" className="form-input input-qty" placeholder="Qty" min="1" value={item.qty} onChange={(e) => handleItemTextChange(index, 'qty', e.target.value)} required />
                                             <input type="number" className="form-input input-price" placeholder="Harga" min="0" value={item.harga} onChange={(e) => handleItemTextChange(index, 'harga', e.target.value)} disabled={!item.isCustom} required />
                                         </div>
@@ -146,20 +146,18 @@ const InvoicePage = () => {
                                 <button type="button" className="btn-add-item" onClick={handleAddItem}>+ Tambah Item</button>
                             </div>
 
-                            {/* FIELD CATATAN USER */}
-                            <div className="form-group" style={{ marginTop: '16px' }}>
+                            <div className="form-group mt-16">
                                 <label>Catatan (Opsional)</label>
                                 <textarea 
-                                    className="form-input" 
+                                    className="form-input form-textarea" 
                                     value={catatan}
                                     onChange={(e) => setCatatan(e.target.value)}
                                     rows="3"
                                     placeholder="Tuliskan catatan khusus terkait tagihan ini..."
-                                    style={{ resize: 'vertical', width: '100%', boxSizing: 'border-box' }}
                                 ></textarea>
                             </div>
 
-                            <button type="submit" className="btn-submit-modal" style={{ marginTop: '20px', width: '100%' }}>Simpan Invoice</button>
+                            <button type="submit" className="btn-submit-modal btn-full-width">Simpan Invoice</button>
                         </form>
                     </div>
                 </div>

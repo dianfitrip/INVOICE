@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import './adminstyles/ManageInvoices.css'; 
+import './adminstyles/ManagePaymentMethods.css';
 
 const ManagePaymentMethods = () => {
     const [methods, setMethods] = useState([]);
@@ -79,7 +79,7 @@ const ManagePaymentMethods = () => {
                         {methods.length > 0 ? methods.map((m, index) => (
                             <tr key={m.id_rekening}>
                                 <td className="mi-text-muted">{index + 1}</td>
-                                <td className="mi-text-main" style={{fontWeight: 'bold'}}>{m.nama_bank}</td>
+                                <td className="mi-text-main fw-bold">{m.nama_bank}</td>
                                 <td>{m.nomor_rekening}</td><td>{m.atas_nama}</td>
                                 <td className="mi-action-cell">
                                     <button className="mi-btn-icon" onClick={() => handleOpenModal(m)}>Edit</button>

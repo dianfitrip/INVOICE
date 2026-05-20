@@ -24,7 +24,7 @@ const icons = {
             <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
         </svg>
     ),
-    items: ( // ICON BARU UNTUK KELOLA ITEM
+    items: (
         <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
             <line x1="8" y1="6" x2="21" y2="6"></line>
             <line x1="8" y1="12" x2="21" y2="12"></line>
@@ -32,6 +32,12 @@ const icons = {
             <line x1="3" y1="6" x2="3.01" y2="6"></line>
             <line x1="3" y1="12" x2="3.01" y2="12"></line>
             <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+    ),
+    payment: (
+        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
         </svg>
     ),
     report: (
@@ -76,7 +82,6 @@ const AdminSidebar = ({ user }) => {
 
     return (
         <aside className="admin-sidebar">
-            {/* Logo */}
             <div className="sidebar-logo-container">
                 <img src="/logorji.png" alt="RJI Logo" className="sidebar-logo" />
                 <div className="sidebar-brand">
@@ -85,42 +90,44 @@ const AdminSidebar = ({ user }) => {
                 </div>
             </div>
 
-            {/* Nav */}
             <nav className="sidebar-nav">
                 <span className="nav-section-label">Menu Utama</span>
 
-                <Link to="/admin" className={`nav-link ${isActive('/admin') ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+                <Link to="/admin" className={`nav-link ${isActive('/admin') ? 'active' : ''}`}>
                     <span className="nav-icon">{icons.dashboard}</span>
                     Dashboard
                 </Link>
 
                 {user?.role === 'superadmin' && (
-                    <Link to="/admin/users" className={`nav-link ${isActive('/admin/users') ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+                    <Link to="/admin/users" className={`nav-link ${isActive('/admin/users') ? 'active' : ''}`}>
                         <span className="nav-icon">{icons.users}</span>
                         Kelola User
                     </Link>
                 )}
 
-                <Link to="/admin/invoices" className={`nav-link ${isActive('/admin/invoices') ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+                <Link to="/admin/invoices" className={`nav-link ${isActive('/admin/invoices') ? 'active' : ''}`}>
                     <span className="nav-icon">{icons.invoice}</span>
                     Kelola Invoice
                 </Link>
 
-                {/* PENAMBAHAN MENU KELOLA ITEM */}
-                <Link to="/admin/items" className={`nav-link ${isActive('/admin/items') ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+                <Link to="/admin/items" className={`nav-link ${isActive('/admin/items') ? 'active' : ''}`}>
                     <span className="nav-icon">{icons.items}</span>
                     Kelola Item
                 </Link>
 
+                <Link to="/admin/payments" className={`nav-link ${isActive('/admin/payments') ? 'active' : ''}`}>
+                    <span className="nav-icon">{icons.payment}</span>
+                    Kelola Payment
+                </Link>
+
                 <span className="nav-section-label">Analitik</span>
 
-                <Link to="/admin/reports" className={`nav-link ${isActive('/admin/reports') ? 'active' : ''}`} style={{ textDecoration: 'none' }}>
+                <Link to="/admin/reports" className={`nav-link ${isActive('/admin/reports') ? 'active' : ''}`}>
                     <span className="nav-icon">{icons.report}</span>
                     Laporan
                 </Link>
             </nav>
 
-            {/* Footer */}
             <div className="sidebar-footer">
                 <div className="sidebar-user-info">
                     <div className="sidebar-user-avatar">
