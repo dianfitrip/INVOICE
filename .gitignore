@@ -19,4 +19,4 @@ yarn-debug.log*
 # Editor
 .vscode/
 .DS_Store
- 
+backend/uploads/

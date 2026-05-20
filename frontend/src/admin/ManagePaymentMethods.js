@@ -8,22 +8,34 @@ const ManagePaymentMethods = () => {
     const [showModal, setShowModal] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [currentId, setCurrentId] = useState(null);
-    const [formData, setFormData] = useState({ nama_bank: '', nomor_rekening: '', atas_nama: '', gambar: null });
+    
+    const [formData, setFormData] = useState({ 
+        nama_bank: '', 
+        nomor_rekening: '', 
+        atas_nama: '', 
+        gambar: null 
+    });
 
     const API_URL = 'http://localhost:5000/api/payment-methods';
     const UPLOADS_URL = 'http://localhost:5000/uploads';
     const userRole = localStorage.getItem('role');
 
     useEffect(() => {
-        if (userRole === 'admin' || userRole === 'superadmin') fetchMethods();
+        if (userRole === 'admin' || userRole === 'superadmin') {
+            fetchMethods();
+        }
     }, [userRole]);
 
     const fetchMethods = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const res = await axios.get(API_URL, { headers: { Authorization: `Bearer ${token}` } });
+            const res = await axios.get(API_URL, { 
+                headers: { Authorization: `Bearer ${token}` } 
+            });
             setMethods(res.data);
-        } catch (error) { console.error(error); }
+        } catch (error) { 
+            console.error("Gagal memuat data", error); 
+        }
     };
 
     const handleOpenModal = (method = null) => {
@@ -38,7 +50,12 @@ const ManagePaymentMethods = () => {
             });
         } else {
             setIsEdit(false); 
-            setFormData({ nama_bank: '', nomor_rekening: '', atas_nama: '', gambar: null });
+            setFormData({ 
+                nama_bank: '', 
+                nomor_rekening: '', 
+                atas_nama: '', 
+                gambar: null 
+            });
         }
         setShowModal(true);
     };
@@ -51,37 +68,59 @@ const ManagePaymentMethods = () => {
         e.preventDefault();
         const token = localStorage.getItem('accessToken');
         
+        // WAJIB gunakan FormData untuk mengirim file gambar
         const submitData = new FormData();
         submitData.append('nama_bank', formData.nama_bank);
         submitData.append('nomor_rekening', formData.nomor_rekening);
         submitData.append('atas_nama', formData.atas_nama);
+        
         if (formData.gambar) {
             submitData.append('gambar', formData.gambar);
         }
 
         try {
+            // Konfigurasi Header untuk file upload
+            const config = {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data' 
+                }
+            };
+
             if (isEdit) {
-                await axios.put(`${API_URL}/${currentId}`, submitData, { headers: { Authorization: `Bearer ${token}` } });
+                await axios.put(`${API_URL}/${currentId}`, submitData, config);
                 Swal.fire('Berhasil', 'Metode pembayaran diperbarui', 'success');
             } else {
-                await axios.post(API_URL, submitData, { headers: { Authorization: `Bearer ${token}` } });
+                await axios.post(API_URL, submitData, config);
                 Swal.fire('Berhasil', 'Metode pembayaran ditambahkan', 'success');
             }
             setShowModal(false); 
             fetchMethods();
         } catch (error) { 
-            Swal.fire('Gagal', 'Terjadi kesalahan saat menyimpan data', 'error'); 
+            console.error("Error Submit:", error);
+            const pesanError = error.response?.data?.msg || 'Gagal menyimpan data';
+            Swal.fire('Gagal', pesanError, 'error'); 
         }
     };
 
     const handleDelete = async (id) => {
-        Swal.fire({ title: 'Hapus Metode?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Hapus' })
-        .then(async (result) => {
+        Swal.fire({ 
+            title: 'Hapus Metode?', 
+            icon: 'warning', 
+            showCancelButton: true, 
+            confirmButtonText: 'Ya, Hapus' 
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                const token = localStorage.getItem('accessToken');
-                await axios.delete(`${API_URL}/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-                fetchMethods(); 
-                Swal.fire('Terhapus', 'Data berhasil dihapus', 'success');
+                try {
+                    const token = localStorage.getItem('accessToken');
+                    await axios.delete(`${API_URL}/${id}`, { 
+                        headers: { Authorization: `Bearer ${token}` } 
+                    });
+                    fetchMethods(); 
+                    Swal.fire('Terhapus', 'Data berhasil dihapus', 'success');
+                } catch (error) {
+                    Swal.fire('Gagal', 'Gagal menghapus data', 'error');
+                }
             }
         });
     };
@@ -119,7 +158,11 @@ const ManagePaymentMethods = () => {
                                 <td>{m.atas_nama}</td>
                                 <td>
                                     {m.gambar ? (
-                                        <img src={`${UPLOADS_URL}/${m.gambar}`} alt="QRIS" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                                        <img 
+                                            src={`${UPLOADS_URL}/${m.gambar}`} 
+                                            alt="QRIS" 
+                                            style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e2e8f0' }} 
+                                        />
                                     ) : (
                                         <span className="mi-text-muted">-</span>
                                     )}
@@ -144,19 +187,39 @@ const ManagePaymentMethods = () => {
                         <form onSubmit={handleSubmit} className="mi-form">
                             <div className="mi-form-group">
                                 <label>Bank / E-Wallet (Contoh: BCA / GoPay / QRIS)</label>
-                                <input type="text" value={formData.nama_bank} onChange={(e) => setFormData({...formData, nama_bank: e.target.value})} required />
+                                <input 
+                                    type="text" 
+                                    value={formData.nama_bank} 
+                                    onChange={(e) => setFormData({...formData, nama_bank: e.target.value})} 
+                                    required 
+                                />
                             </div>
                             <div className="mi-form-group">
                                 <label>Nomor Rekening / No. HP (Isi '-' jika hanya QRIS)</label>
-                                <input type="text" value={formData.nomor_rekening} onChange={(e) => setFormData({...formData, nomor_rekening: e.target.value})} required />
+                                <input 
+                                    type="text" 
+                                    value={formData.nomor_rekening} 
+                                    onChange={(e) => setFormData({...formData, nomor_rekening: e.target.value})} 
+                                    required 
+                                />
                             </div>
                             <div className="mi-form-group">
                                 <label>Atas Nama (Pemilik Rekening)</label>
-                                <input type="text" value={formData.atas_nama} onChange={(e) => setFormData({...formData, atas_nama: e.target.value})} required />
+                                <input 
+                                    type="text" 
+                                    value={formData.atas_nama} 
+                                    onChange={(e) => setFormData({...formData, atas_nama: e.target.value})} 
+                                    required 
+                                />
                             </div>
                             <div className="mi-form-group">
                                 <label>Unggah Foto / QRIS (Opsional)</label>
-                                <input type="file" accept="image/*" onChange={handleFileChange} />
+                                <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    onChange={handleFileChange} 
+                                    style={{ width: '100%', padding: '8px' }}
+                                />
                             </div>
                             <div className="mi-modal-actions">
                                 <button type="button" className="mi-btn-outline" onClick={() => setShowModal(false)}>Batal</button>
@@ -169,4 +232,5 @@ const ManagePaymentMethods = () => {
         </div>
     );
 };
+
 export default ManagePaymentMethods;
