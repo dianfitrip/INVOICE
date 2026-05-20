@@ -6,6 +6,7 @@ const PaymentMethod = db.define('PaymentMethod', {
     nama_bank: { type: DataTypes.STRING(100), allowNull: false },
     nomor_rekening: { type: DataTypes.STRING(100), allowNull: false },
     atas_nama: { type: DataTypes.STRING(150), allowNull: false },
+    gambar: { type: DataTypes.STRING, allowNull: true },
     created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, {
     tableName: 'payment_methods',
