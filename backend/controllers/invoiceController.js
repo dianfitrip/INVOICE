@@ -3,7 +3,8 @@ const { Invoice, InvoiceItem, Kwitansi, User } = require('../models');
 // CREATE INVOICE
 exports.createInvoice = async (req, res) => {
     try {
-        const { tanggal_invoice, items, id_user_admin } = req.body;
+        // Tangkap catatan dari req.body
+        const { tanggal_invoice, items, id_user_admin, catatan } = req.body;
         const id_user = id_user_admin || req.userId; 
 
         if (!id_user) return res.status(400).json({ msg: "User ID tidak ditemukan" });
@@ -22,7 +23,8 @@ exports.createInvoice = async (req, res) => {
             nomor_invoice: nomor_invoice,
             tanggal_invoice: tanggal_invoice,
             total: total,
-            status: 'Belum Dibayar'
+            status: 'Belum Dibayar',
+            catatan: catatan || null // SIMPAN CATATAN KE DATABASE
         });
 
         const invoiceItems = items.map(item => ({

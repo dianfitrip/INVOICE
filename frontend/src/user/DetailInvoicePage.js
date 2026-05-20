@@ -11,7 +11,7 @@ const DetailInvoicePage = () => {
     const [invoice, setInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
     
-    const [fileBukti, setFileBukti] = useState(null); // State untuk file bukti
+    const [fileBukti, setFileBukti] = useState(null); 
     const [isUploading, setIsUploading] = useState(false);
 
     const documentRef = useRef(null);
@@ -43,7 +43,6 @@ const DetailInvoicePage = () => {
         }
     };
 
-    // Fungsi Submit Bukti Pembayaran
     const handleUploadBukti = async (e) => {
         e.preventDefault();
         if (!fileBukti) return Swal.fire('Peringatan', 'Silakan pilih file gambar bukti transfer terlebih dahulu.', 'warning');
@@ -58,14 +57,14 @@ const DetailInvoicePage = () => {
             const response = await fetch(`http://localhost:5000/api/invoices/${id}/upload-bukti`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
-                body: formData // Jangan set Content-Type, biarkan browser yang atur boundary multipartnya otomatis
+                body: formData 
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 Swal.fire('Berhasil!', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi admin.', 'success');
-                fetchInvoiceDetail(); // Refresh data untuk mengubah UI ke 'Menunggu Verifikasi'
+                fetchInvoiceDetail(); 
             } else {
                 Swal.fire('Gagal', data.msg || 'Gagal mengunggah bukti', 'error');
             }
@@ -113,6 +112,7 @@ const DetailInvoicePage = () => {
             <Navbar />
 
             <div className="dip-main-container">
+                {/* TOOLBAR ATAS */}
                 <div className="dip-toolbar">
                     <button className="dip-btn-back" onClick={() => navigate('/invoice')}>&larr; Kembali</button>
                     <div className="dip-toolbar-actions">
@@ -129,7 +129,7 @@ const DetailInvoicePage = () => {
                     </div>
                 </div>
 
-                {/* FORM UNGGAH BUKTI (HANYA MUNCUL JIKA BELUM DIBAYAR) */}
+                {/* FORM UNGGAH BUKTI */}
                 {invoice.status === 'Belum Dibayar' && (
                     <div style={{ backgroundColor: '#fff', padding: '24px', borderRadius: '12px', marginBottom: '24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
                         <h3 style={{ margin: '0 0 16px 0', fontSize: '18px' }}>Konfirmasi Pembayaran</h3>
@@ -166,9 +166,8 @@ const DetailInvoicePage = () => {
                     </div>
                 )}
 
-                {/* KERTAS DOKUMEN YANG AKAN DI-DOWNLOAD */}
+                {/* KERTAS DOKUMEN YANG AKAN DI-DOWNLOAD PDF */}
                 <div className="dip-document-paper" ref={documentRef}>
-                   {/* ... (Isi kertas dokumen INVOICE persis sama dengan kodingan sebelumnya) ... */}
                     <div className="dip-doc-header">
                         <div className="dip-doc-brand">
                             <img src="/logorji.png" alt="Logo RJI" className="dip-brand-logo" />
@@ -223,6 +222,14 @@ const DetailInvoicePage = () => {
                         </div>
                     </div>
 
+                    {/* TAMPILKAN CATATAN TAMBAHAN JIKA ADA */}
+                    {invoice.catatan && (
+                        <div style={{ marginBottom: '24px', padding: '16px', backgroundColor: '#fef3c7', borderRadius: '8px', borderLeft: '4px solid #f59e0b' }}>
+                            <strong style={{ fontSize: '13px', color: '#b45309', display: 'block', marginBottom: '4px' }}>CATATAN TAMBAHAN:</strong>
+                            <p style={{ margin: 0, fontSize: '14px', color: '#92400e', whiteSpace: 'pre-wrap' }}>{invoice.catatan}</p>
+                        </div>
+                    )}
+
                     <table className="dip-items-table">
                         <thead>
                             <tr>
@@ -251,9 +258,9 @@ const DetailInvoicePage = () => {
                     <div className="dip-doc-footer">
                         <div className="dip-notes" style={{ maxWidth: '55%', fontSize: '13px', color: '#64748b', lineHeight: '1.5' }}>
                             {isLunas ? (
-                                <p><strong>Catatan:</strong> Terima kasih, dokumen ini diterbitkan sebagai bukti transaksi resmi pembayaran sah Relawan Jurnal Indonesia.</p>
+                                <p><strong>Informasi:</strong> Terima kasih, dokumen ini diterbitkan sebagai bukti transaksi resmi pembayaran sah Relawan Jurnal Indonesia.</p>
                             ) : (
-                                <p><strong>Catatan:</strong> Harap lakukan penyelesaian administrasi sesuai rincian di atas agar hak klaim fasilitas sistem dapat segera diproses.</p>
+                                <p><strong>Informasi:</strong> Harap lakukan penyelesaian administrasi sesuai rincian di atas agar hak klaim fasilitas sistem dapat segera diproses.</p>
                             )}
                         </div>
                         <div className="dip-totals-box" style={{ minWidth: '280px', marginLeft: 'auto' }}>
