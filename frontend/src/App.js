@@ -13,6 +13,7 @@ import AdminDashboard from './admin/AdminDashboard';
 import ManageUsers from './admin/ManageUsers';
 import ManageInvoices from './admin/ManageInvoices';
 import ManageItems from './admin/ManageItems'; 
+import ManagePaymentMethods from './admin/ManagePaymentMethods';
 import './App.css';
 
 function App() {
@@ -63,6 +64,8 @@ function App() {
             </ProtectedRoute>
         } />
 
+        <Route path="/admin/payments" element={<ProtectedRoute allowedRoles={['admin', 'superadmin']}><AdminLayout><ManagePaymentMethods /></AdminLayout></ProtectedRoute>} />
+        
         {/* Rute Fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

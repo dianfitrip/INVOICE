@@ -3,6 +3,7 @@ const Invoice = require('./Invoice');
 const InvoiceItem = require('./InvoiceItem');
 const Kwitansi = require('./Kwitansi');
 const Payment = require('./Payment');
+const PaymentMethod = require('./PaymentMethod');
 
 // PENAMBAHAN: Import model ServiceItem
 const ServiceItem = require('./ServiceItem'); 
@@ -23,11 +24,14 @@ Invoice.hasOne(Kwitansi, { foreignKey: 'id_invoice' });
 Payment.belongsTo(Invoice, { foreignKey: 'id_invoice' });
 Invoice.hasMany(Payment, { foreignKey: 'id_invoice' });
 
+module.exports = { User, Invoice, InvoiceItem, Kwitansi, Payment, ServiceItem, PaymentMethod };
+
 module.exports = {
     User,
     Invoice,
     InvoiceItem,
     Kwitansi,
     Payment,
-    ServiceItem // PENAMBAHAN: Ekspor ServiceItem agar bisa diakses oleh Controller
+    ServiceItem,
+    PaymentMethod
 };
